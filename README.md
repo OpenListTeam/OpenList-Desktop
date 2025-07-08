@@ -216,9 +216,9 @@ yarn run tauri build
 
 添加自定义 Rclone 标志以获得最佳性能：
 
-- `--vfs-cache-mode full`：启用完整 VFS 缓存
-- `--buffer-size 256M`：增加缓冲区大小
-- `--transfers 10`：并发传输限制
+- `--vfs-cache-mode=full`：启用完整 VFS 缓存
+- `--buffer-size=256M`：增加缓冲区大小
+- `--transfers=10`：并发传输限制
 
 #### 系统托盘操作
 
