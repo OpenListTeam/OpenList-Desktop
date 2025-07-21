@@ -855,9 +855,9 @@
     "@tauri-apps/api" "^2.6.0"
 
 "@tauri-apps/plugin-dialog@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-dialog/-/plugin-dialog-2.3.0.tgz#123d2cd3d98467b9b115d23ad71eef469d6ead35"
-  integrity sha512-ylSBvYYShpGlKKh732ZuaHyJ5Ie1JR71QCXewCtsRLqGdc8Is4xWdz6t43rzXyvkItM9syNPMvFVcvjgEy+/GA==
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-dialog/-/plugin-dialog-2.3.1.tgz#ae29fdc9346fce2e4a54dd0a80a35a1ba86c05f0"
+  integrity sha512-B7jvyhycV8SI/WHzPjciwtYfdFM6/9EXuMjRgYWZwn8GPDmHxpT80aJdb/eDVN+NgoAFDh9bu4QPonYahoYnZQ==
   dependencies:
     "@tauri-apps/api" "^2.6.0"
 
