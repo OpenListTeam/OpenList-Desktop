@@ -8,12 +8,14 @@ import { useTray } from './composables/useTray'
 import { TauriAPI } from './api/tauri'
 import Navigation from './components/Navigation.vue'
 import TitleBar from './components/ui/TitleBar.vue'
+import { platform } from '@tauri-apps/plugin-os'
 
 const appStore = useAppStore()
 const { t } = useTranslation()
 const { updateTrayMenu } = useTray()
 const router = useRouter()
 const isLoading = ref(true)
+const isMacOS = ref(false)
 
 let updateUnlisten: (() => void) | null = null
 
@@ -47,6 +49,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 onMounted(async () => {
+  isMacOS.value = platform() === 'macos'
   try {
     appStore.init()
     appStore.applyTheme(appStore.settings.app.theme || 'light')
@@ -122,9 +125,9 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <div v-else id="app" class="app-container">
+  <div v-else id="app" class="app-container" :style="{ paddingTop: isMacOS ? '0' : '32px' }">
     <!-- Custom Title Bar -->
-    <TitleBar />
+    <TitleBar v-if="!isMacOS" />
 
     <div class="app-background">
       <div class="bg-gradient-primary"></div>
