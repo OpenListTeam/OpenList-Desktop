@@ -46,6 +46,7 @@ tar = "0.4.44"
 flate2 = "1.1.2"
 regex = "1.11.1"
 sysinfo = "0.36.1"
+tauri-plugin-os = "2"
 
 [target.'cfg(windows)'.dependencies]
 runas = "=1.2.0"
