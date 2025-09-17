@@ -43,7 +43,8 @@ fn get_user_data_dir() -> Result<PathBuf, String> {
 
     #[cfg(target_os = "windows")]
     {
-        let appdata = env::var("APPDATA").map_err(|_| "Failed to get APPDATA environment variable")?;
+        let appdata =
+            env::var("APPDATA").map_err(|_| "Failed to get APPDATA environment variable")?;
         let data_dir = PathBuf::from(appdata).join("OpenList Desktop");
         fs::create_dir_all(&data_dir)
             .map_err(|e| format!("Failed to create data directory: {e}"))?;
