@@ -66,7 +66,7 @@ fn get_user_logs_dir() -> Result<PathBuf, String> {
 
     #[cfg(not(target_os = "macos"))]
     {
-        let logs = get_app_dir()?.join("logs");
+        let logs = get_user_data_dir()?.join("logs");
         fs::create_dir_all(&logs).map_err(|e| e.to_string())?;
         Ok(logs)
     }
@@ -112,15 +112,7 @@ pub fn get_rclone_config_path() -> Result<PathBuf, String> {
 }
 
 pub fn get_default_openlist_data_dir() -> Result<PathBuf, String> {
-    #[cfg(target_os = "macos")]
-    {
-        Ok(get_user_data_dir()?.join("data"))
-    }
-
-    #[cfg(not(target_os = "macos"))]
-    {
-        Ok(get_app_dir()?.join("data"))
-    }
+    Ok(get_user_data_dir()?.join("data"))
 }
 
 pub fn get_service_log_path() -> Result<PathBuf, String> {
@@ -139,6 +131,6 @@ pub fn get_service_log_path() -> Result<PathBuf, String> {
 
     #[cfg(not(target_os = "macos"))]
     {
-        Ok(get_app_dir()?.join("openlist-desktop-service.log"))
+        Ok(get_user_data_dir()?.join("openlist-desktop-service.log"))
     }
 }
