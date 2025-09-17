@@ -29,9 +29,25 @@ fn get_user_data_dir() -> Result<PathBuf, String> {
         Ok(data_dir)
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "linux")]
     {
-        get_app_dir()
+        let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
+        let data_dir = PathBuf::from(home)
+            .join(".local")
+            .join("share")
+            .join("OpenList Desktop");
+        fs::create_dir_all(&data_dir)
+            .map_err(|e| format!("Failed to create data directory: {e}"))?;
+        Ok(data_dir)
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let appdata = env::var("APPDATA").map_err(|_| "Failed to get APPDATA environment variable")?;
+        let data_dir = PathBuf::from(appdata).join("OpenList Desktop");
+        fs::create_dir_all(&data_dir)
+            .map_err(|e| format!("Failed to create data directory: {e}"))?;
+        Ok(data_dir)
     }
 }
 
