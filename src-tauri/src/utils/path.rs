@@ -17,60 +17,61 @@ fn get_app_dir() -> Result<PathBuf, String> {
 }
 
 fn get_user_data_dir() -> Result<PathBuf, String> {
-    #[cfg(target_os = "macos")]
-    {
-        let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
-        let data_dir = PathBuf::from(home)
-            .join("Library")
-            .join("Application Support")
-            .join("OpenList Desktop");
-        fs::create_dir_all(&data_dir)
-            .map_err(|e| format!("Failed to create data directory: {e}"))?;
-        Ok(data_dir)
-    }
+    let data_dir = {
+        #[cfg(target_os = "macos")]
+        {
+            let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
+            PathBuf::from(home)
+                .join("Library")
+                .join("Application Support")
+                .join("OpenList Desktop")
+        }
 
-    #[cfg(target_os = "linux")]
-    {
-        let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
-        let data_dir = PathBuf::from(home)
-            .join(".local")
-            .join("share")
-            .join("OpenList Desktop");
-        fs::create_dir_all(&data_dir)
-            .map_err(|e| format!("Failed to create data directory: {e}"))?;
-        Ok(data_dir)
-    }
+        #[cfg(target_os = "linux")]
+        {
+            let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
+            PathBuf::from(home)
+                .join(".local")
+                .join("share")
+                .join("OpenList Desktop")
+        }
 
-    #[cfg(target_os = "windows")]
-    {
-        let appdata =
-            env::var("APPDATA").map_err(|_| "Failed to get APPDATA environment variable")?;
-        let data_dir = PathBuf::from(appdata).join("OpenList Desktop");
-        fs::create_dir_all(&data_dir)
-            .map_err(|e| format!("Failed to create data directory: {e}"))?;
-        Ok(data_dir)
-    }
+        #[cfg(target_os = "windows")]
+        {
+            let appdata =
+                env::var("APPDATA").map_err(|_| "Failed to get APPDATA environment variable")?;
+            PathBuf::from(appdata).join("OpenList Desktop")
+        }
+    };
+
+    fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data directory: {e}"))?;
+
+    data_dir
+        .canonicalize()
+        .map_err(|e| format!("Failed to canonicalize data directory: {e}"))
 }
 
 fn get_user_logs_dir() -> Result<PathBuf, String> {
-    #[cfg(target_os = "macos")]
-    {
-        let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
-        let logs_dir = PathBuf::from(home)
-            .join("Library")
-            .join("Logs")
-            .join("OpenList Desktop");
-        fs::create_dir_all(&logs_dir)
-            .map_err(|e| format!("Failed to create logs directory: {e}"))?;
-        Ok(logs_dir)
-    }
+    let logs_dir = {
+        #[cfg(target_os = "macos")]
+        {
+            let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
+            PathBuf::from(home)
+                .join("Library")
+                .join("Logs")
+                .join("OpenList Desktop")
+        }
 
-    #[cfg(not(target_os = "macos"))]
-    {
-        let logs = get_user_data_dir()?.join("logs");
-        fs::create_dir_all(&logs).map_err(|e| e.to_string())?;
-        Ok(logs)
-    }
+        #[cfg(not(target_os = "macos"))]
+        {
+            get_user_data_dir()?.join("logs")
+        }
+    };
+
+    fs::create_dir_all(&logs_dir).map_err(|e| format!("Failed to create logs directory: {e}"))?;
+    logs_dir
+        .canonicalize()
+        .map_err(|e| format!("Failed to canonicalize logs directory: {e}"))
 }
 
 fn get_binary_path(binary: &str, service_name: &str) -> Result<PathBuf, String> {
