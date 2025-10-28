@@ -21,6 +21,10 @@ env:
   APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
   APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+  # Certum cloud code signing for Windows
+  CERTUM_OTP_URI: ${{ secrets.CERTUM_OTP_URI }}
+  CERTUM_USERNAME: ${{ secrets.CERTUM_USERNAME }}
+  CERTUM_CERTIFICATE_SHA1: ${{ secrets.CERTUM_CERTIFICATE_SHA1 }}
 
 concurrency:
   group: "${{ github.workflow }} - ${{ github.head_ref || github.ref }}"
@@ -174,19 +178,37 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
-      - name: Import Windows certificate
-        if: matrix.os == 'windows-latest' && env.WINDOWS_CERTIFICATE != ''
-        env:
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+      - name: Setup Certum Code Signing (Windows)
+        if: matrix.platform == 'windows'
         run: |
-          if ($env:WINDOWS_CERTIFICATE) {
-            New-Item -ItemType directory -Path certificate
-            Set-Content -Path certificate/tempCert.txt -Value $env:WINDOWS_CERTIFICATE
-            certutil -decode certificate/tempCert.txt certificate/certificate.pfx
-            Remove-Item -path certificate -include tempCert.txt
-            Import-PfxCertificate -FilePath certificate/certificate.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String $env:WINDOWS_CERTIFICATE_PASSWORD -Force -AsPlainText)
-          }
+          echo "=== SETTING UP CERTUM CODE SIGNING FOR WINDOWS ==="
+          echo "Installing SimplySign Desktop and configuring for automatic authentication"
+          
+          # Install SimplySign Desktop
+          chmod +x ./.github/scripts/install-simplysign.sh
+          ./.github/scripts/install-simplysign.sh
+          
+          # Configure registry for auto-login dialog
+          echo "Configuring registry for automatic login dialog..."
+          powershell -ExecutionPolicy Bypass -File "./.github/scripts/configure-simplysign-registry.ps1"
+          
+          echo "Certum signing environment ready"
+        shell: bash
+
+      - name: Authenticate Certum (Windows)
+        if: matrix.platform == 'windows'
+        env:
+          CERTUM_OTP_URI: ${{ secrets.CERTUM_OTP_URI }}
+          CERTUM_USERNAME: ${{ secrets.CERTUM_USERNAME }}
+        run: |
+          echo "=== CERTUM AUTHENTICATION ==="
+          echo "Authenticating with Certum cloud certificate using TOTP"
+          
+          # Authenticate with Certum using our enhanced script
+          powershell -ExecutionPolicy Bypass -File "./.github/scripts/Connect-SimplySign-Enhanced.ps1"
+          
+          echo "Authentication completed"
+        shell: bash
 
       - name: Build the app
         if: matrix.platform == 'windows' || matrix.platform == 'linux'
@@ -203,8 +225,71 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+
+      - name: Verify Certificate and Sign Windows Binaries
+        if: matrix.platform == 'windows'
+        env:
+          CERTUM_CERTIFICATE_SHA1: ${{ secrets.CERTUM_CERTIFICATE_SHA1 }}
+        run: |
+          echo "=== CERTIFICATE VERIFICATION AND WINDOWS BINARY SIGNING ==="
+          echo "Allowing connection to stabilize..."
+          sleep 10
+          
+          echo "Comprehensive certificate availability check..."
+          echo ""
+          
+          echo "=== Windows Certificate Store Analysis ==="
+          powershell -Command "
+            Write-Host 'Current User Personal Store:'
+            Get-ChildItem -Path 'Cert:\\CurrentUser\\My' -ErrorAction SilentlyContinue | 
+              Select-Object Subject, Issuer, Thumbprint, HasPrivateKey, NotAfter |
+              Format-Table -AutoSize
+            
+            Write-Host 'Local Machine Personal Store:'
+            Get-ChildItem -Path 'Cert:\\LocalMachine\\My' -ErrorAction SilentlyContinue |
+              Select-Object Subject, Issuer, Thumbprint, HasPrivateKey, NotAfter |
+              Format-Table -AutoSize
+            
+            Write-Host 'Searching for Certum-related certificates:'
+            Get-ChildItem -Path 'Cert:\\CurrentUser\\*','Cert:\\LocalMachine\\*' -Recurse -ErrorAction SilentlyContinue |
+              Where-Object { \$_.Subject -like '*Certum*' -or \$_.Issuer -like '*Certum*' -or \$_.Subject -like '*Code Signing*' } |
+              Select-Object Subject, Issuer, Thumbprint, HasPrivateKey, NotAfter |
+              Format-Table -AutoSize
+            
+            Write-Host 'Certificates with Code Signing capability:'
+            Get-ChildItem -Path 'Cert:\\CurrentUser\\My','Cert:\\LocalMachine\\My' -ErrorAction SilentlyContinue |
+              Where-Object { \$_.EnhancedKeyUsageList -like '*Code Signing*' } |
+              Select-Object Subject, Issuer, Thumbprint, HasPrivateKey, NotAfter |
+              Format-Table -AutoSize
+          "
+          
+          echo ""
+          echo "=== PKCS#11 Library Check ==="
+          if [ -f "/c/Windows/System32/SimplySignPKCS.dll" ]; then
+            echo "PKCS#11 library present: /c/Windows/System32/SimplySignPKCS.dll"
+            ls -la "/c/Windows/System32/SimplySignPKCS.dll"
+          else
+            echo "PKCS#11 library not found"
+          fi
+          
+          echo ""
+          echo "=== SimplySign Desktop Status ==="
+          powershell -Command "
+            Write-Host 'SimplySign Desktop process status:'
+            Get-Process -Name '*SimplySign*' -ErrorAction SilentlyContinue |
+              Select-Object Name, Id, MainWindowTitle, Responding |
+              Format-Table -AutoSize
+          "
+          
+          echo ""
+          echo "Certificate debugging completed - proceeding to signing..."
+          echo ""
+          
+          # Sign all Windows Tauri binaries
+          powershell -ExecutionPolicy Bypass -File "./.github/scripts/Sign-Tauri-Windows.ps1"
+          
+          echo "Windows binary signing completed"
+        shell: bash
       
       - name: Build the app (macOS)
         if: matrix.platform == 'macos'
@@ -222,8 +307,6 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
