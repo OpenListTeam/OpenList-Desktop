@@ -1,7 +1,6 @@
 # Connect-SimplySign-Enhanced.ps1
 # Registry-Enhanced TOTP Authentication for SimplySign Desktop
 # Uses registry pre-configuration + TOTP credential injection approach
-# Based on Devas.life article: https://www.devas.life/how-to-automate-signing-your-windows-app-with-certum/
 
 param(
     [string]$OtpUri = $env:CERTUM_OTP_URI,
