@@ -3,6 +3,31 @@ use std::{env, fs};
 
 pub static APP_ID: &str = "io.github.openlistteam.openlist.desktop";
 
+// Normalize path without Windows long path prefix (\\?\)
+// The \\?\ prefix breaks compatibility with some applications like SQLite
+fn normalize_path(path: &PathBuf) -> Result<PathBuf, String> {
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, use canonicalize but strip the \\?\ prefix if present
+        let canonical = path
+            .canonicalize()
+            .map_err(|e| format!("Failed to canonicalize path: {e}"))?;
+        
+        let path_str = canonical.to_string_lossy();
+        if let Some(stripped) = path_str.strip_prefix(r"\\?\") {
+            Ok(PathBuf::from(stripped))
+        } else {
+            Ok(canonical)
+        }
+    }
+    
+    #[cfg(not(target_os = "windows"))]
+    {
+        path.canonicalize()
+            .map_err(|e| format!("Failed to canonicalize path: {e}"))
+    }
+}
+
 fn get_app_dir() -> Result<PathBuf, String> {
     let app_dir = env::current_exe()
         .map_err(|e| format!("Failed to get current exe path: {e}"))?
@@ -46,9 +71,7 @@ fn get_user_data_dir() -> Result<PathBuf, String> {
 
     fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data directory: {e}"))?;
 
-    data_dir
-        .canonicalize()
-        .map_err(|e| format!("Failed to canonicalize data directory: {e}"))
+    normalize_path(&data_dir)
 }
 
 fn get_user_logs_dir() -> Result<PathBuf, String> {
@@ -69,9 +92,7 @@ fn get_user_logs_dir() -> Result<PathBuf, String> {
     };
 
     fs::create_dir_all(&logs_dir).map_err(|e| format!("Failed to create logs directory: {e}"))?;
-    logs_dir
-        .canonicalize()
-        .map_err(|e| format!("Failed to canonicalize logs directory: {e}"))
+    normalize_path(&logs_dir)
 }
 
 fn get_binary_path(binary: &str, service_name: &str) -> Result<PathBuf, String> {
