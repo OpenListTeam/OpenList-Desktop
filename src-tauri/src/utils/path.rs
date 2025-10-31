@@ -144,16 +144,14 @@ pub fn get_service_log_path() -> Result<PathBuf, String> {
         let home = env::var("HOME").map_err(|_| "Failed to get HOME environment variable")?;
         let logs = PathBuf::from(home)
             .join("Library")
-            .join("Application Support")
-            .join("io.github.openlistteam.openlist.service.bundle")
-            .join("Contents")
-            .join("MacOS")
+            .join("Logs")
+            .join("OpenList Desktop")
             .join("openlist-desktop-service.log");
         Ok(logs)
     }
 
     #[cfg(not(target_os = "macos"))]
     {
-        Ok(get_user_data_dir()?.join("openlist-desktop-service.log"))
+        Ok(get_app_logs_dir()?.join("openlist-desktop-service.log"))
     }
 }
