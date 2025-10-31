@@ -225,18 +225,17 @@ jobs:
 
       - name: Build the app
         if: matrix.platform == 'windows' || matrix.platform == 'linux'
-        run: |
-          yarn build --target ${{ matrix.target }}
+        uses: tauri-apps/tauri-action@v0
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+        with:
+          args: --target ${{ matrix.target }}
       
       - name: Build the app (macOS)
+        uses: tauri-apps/tauri-action@v0
         if: matrix.platform == 'macos'
-        run: |
-          export TAURI_SKIP_SIDECAR_SIGNATURE_CHECK=true
-          yarn build --target ${{ matrix.target }}
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -248,6 +247,9 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          TAURI_SKIP_SIDECAR_SIGNATURE_CHECK: "true"
+        with:
+          args: --target ${{ matrix.target }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
