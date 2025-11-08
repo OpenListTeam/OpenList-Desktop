@@ -33,8 +33,8 @@ const logContainer = ref<HTMLElement>()
 const searchInputRef = ref<HTMLInputElement>()
 const autoScroll = ref(true)
 const isPaused = ref(false)
-const filterLevel = ref<string>(localStorage.getItem('logFilterLevel') || 'all')
-const filterSource = ref<string>(localStorage.getItem('logFilterSource') || 'openlist')
+const filterLevel = ref<string>(appStore.settings.app.log_filter_level || 'all')
+const filterSource = ref<string>(appStore.settings.app.log_filter_source || 'openlist')
 const searchQuery = ref('')
 const selectedEntries = ref<Set<number>>(new Set())
 const showFilters = ref(true)
@@ -55,12 +55,14 @@ const confirmDialogConfig = ref({
   onCancel: () => {}
 })
 
-watch(filterLevel, newValue => {
-  localStorage.setItem('logFilterLevel', newValue)
+watch(filterLevel, async newValue => {
+  appStore.settings.app.log_filter_level = newValue
+  await appStore.saveSettings()
 })
 
 watch(filterSource, async newValue => {
-  localStorage.setItem('logFilterSource', newValue)
+  appStore.settings.app.log_filter_source = newValue
+  await appStore.saveSettings()
   await appStore.loadLogs((newValue !== 'gin' ? newValue : 'openlist') as filterSourceType)
   await scrollToBottom()
 })

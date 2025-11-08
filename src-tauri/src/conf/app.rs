@@ -9,6 +9,8 @@ pub struct AppConfig {
     pub open_links_in_browser: Option<bool>,
     pub admin_password: Option<String>,
     pub show_window_on_startup: Option<bool>,
+    pub log_filter_level: Option<String>,
+    pub log_filter_source: Option<String>,
 }
 
 impl AppConfig {
@@ -21,6 +23,8 @@ impl AppConfig {
             open_links_in_browser: Some(false),
             admin_password: None,
             show_window_on_startup: Some(true),
+            log_filter_level: Some("all".to_string()),
+            log_filter_source: Some("openlist".to_string()),
         }
     }
 }

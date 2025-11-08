@@ -52,6 +52,8 @@ interface AppConfig {
   open_links_in_browser?: boolean
   admin_password?: string
   show_window_on_startup?: boolean
+  log_filter_level?: string
+  log_filter_source?: string
 }
 
 interface MergedSettings {
