@@ -33,7 +33,7 @@ const logContainer = ref<HTMLElement>()
 const searchInputRef = ref<HTMLInputElement>()
 const autoScroll = ref(true)
 const isPaused = ref(false)
-const filterLevel = ref<string>('all')
+const filterLevel = ref<string>(localStorage.getItem('logFilterLevel') || 'all')
 const filterSource = ref<string>(localStorage.getItem('logFilterSource') || 'openlist')
 const searchQuery = ref('')
 const selectedEntries = ref<Set<number>>(new Set())
@@ -53,6 +53,10 @@ const confirmDialogConfig = ref({
   message: '',
   onConfirm: () => {},
   onCancel: () => {}
+})
+
+watch(filterLevel, newValue => {
+  localStorage.setItem('logFilterLevel', newValue)
 })
 
 watch(filterSource, async newValue => {
