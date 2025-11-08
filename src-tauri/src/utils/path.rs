@@ -1,11 +1,11 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::{env, fs};
 
 pub static APP_ID: &str = "io.github.openlistteam.openlist.desktop";
 
 // Normalize path without Windows long path prefix (\\?\)
 // The \\?\ prefix breaks compatibility with some applications like SQLite
-fn normalize_path(path: &PathBuf) -> Result<PathBuf, String> {
+fn normalize_path(path: &Path) -> Result<PathBuf, String> {
     #[cfg(target_os = "windows")]
     {
         // On Windows, use canonicalize but strip the \\?\ prefix if present
