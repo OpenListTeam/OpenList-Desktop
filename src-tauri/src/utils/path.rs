@@ -12,7 +12,7 @@ fn normalize_path(path: &PathBuf) -> Result<PathBuf, String> {
         let canonical = path
             .canonicalize()
             .map_err(|e| format!("Failed to canonicalize path: {e}"))?;
-        
+
         let path_str = canonical.to_string_lossy();
         if let Some(stripped) = path_str.strip_prefix(r"\\?\") {
             Ok(PathBuf::from(stripped))
@@ -20,7 +20,7 @@ fn normalize_path(path: &PathBuf) -> Result<PathBuf, String> {
             Ok(canonical)
         }
     }
-    
+
     #[cfg(not(target_os = "windows"))]
     {
         path.canonicalize()
