@@ -45,7 +45,7 @@ jobs:
       version-type: ${{ steps.check.outputs.version-type }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -94,7 +94,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -193,7 +193,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.version != ''
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Ensure jq and grep are installed
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -253,7 +253,7 @@ jobs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -320,7 +320,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
@@ -485,7 +485,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
@@ -608,7 +608,7 @@ jobs:
     if: always() && needs.build.result == 'success' && needs.changelog.result == 'success'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: Download changelog
         uses: actions/download-artifact@v4
@@ -643,7 +643,7 @@ jobs:
     if: always() && needs.publish.result == 'success'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get release version
         id: version
