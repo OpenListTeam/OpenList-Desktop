@@ -114,7 +114,7 @@ async fn is_rclone_running() -> bool {
     let mut system = System::new_all();
     system.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
 
-    for (_pid, process) in system.processes() {
+    for process in system.processes().values() {
         let process_name = process.name().to_string_lossy().to_lowercase();
 
         if process_name.contains("rclone") {

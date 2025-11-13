@@ -204,18 +204,20 @@ pub async fn create_rclone_mount_remote_process(
     let rclone_conf_path =
         get_rclone_config_path().map_err(|e| format!("Failed to get rclone config path: {e}"))?;
 
-    // Extract mount point from args and create directory if it doesn't exist
+    // Extract mount point from args and create directory if it doesn't exist.
+    // The mount point is the second non-flag argument (first is remote:path).
     let args_vec = split_args_vec(config.args.clone());
-    if args_vec.len() >= 2 {
-        let mount_point = &args_vec[1]; // Mount point is typically the second argument
+    let mount_point_opt = args_vec.iter().filter(|arg| !arg.starts_with('-')).nth(1); // 0th is remote:path, 1st is mount_point
+
+    if let Some(mount_point) = mount_point_opt {
         let mount_path = Path::new(mount_point);
-        if !mount_path.exists() {
-            if let Err(e) = fs::create_dir_all(mount_path) {
-                return Err(format!(
-                    "Failed to create mount point directory '{}': {}",
-                    mount_point, e
-                ));
-            }
+        if !mount_path.exists()
+            && let Err(e) = fs::create_dir_all(mount_path)
+        {
+            return Err(format!(
+                "Failed to create mount point directory '{}': {}",
+                mount_point, e
+            ));
         }
     }
 
@@ -327,8 +329,9 @@ pub async fn get_mount_info_list(
                             if process.is_running {
                                 if is_mounted { "mounted" } else { "mounting" }
                             } else {
-                                // If process is not running, the mount point should be considered unmounted
-                                // regardless of whether the directory exists or not
+                                // If process is not running, the mount point should be considered
+                                // unmounted regardless of whether
+                                // the directory exists or not
                                 "unmounted"
                             }
                         }
