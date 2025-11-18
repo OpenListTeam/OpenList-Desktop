@@ -11,7 +11,15 @@
         "conflicts": ["openlist-desktop"],
         "replaces": ["openlist-desktop"],
         "postInstallScript": "./packages/linux/post-install.sh",
-        "preRemoveScript": "./packages/linux/pre-remove.sh"
+        "preRemoveScript": "./packages/linux/pre-remove.sh",
+        "files": {
+          "/opt/OpenList-Desktop/openlist-desktop": "usr/bin/openlist-desktop",
+          "/opt/OpenList-Desktop/install-openlist-service": "usr/bin/install-openlist-service",
+          "/opt/OpenList-Desktop/uninstall-openlist-service": "usr/bin/uninstall-openlist-service",
+          "/opt/OpenList-Desktop/openlist-desktop-service": "usr/bin/openlist-desktop-service",
+          "/opt/OpenList-Desktop/openlist": "usr/bin/openlist",
+          "/opt/OpenList-Desktop/rclone": "usr/bin/rclone"
+        }
       },
       "rpm": {
         "depends": ["openssl"],
@@ -20,7 +28,15 @@
         "conflicts": ["openlist-desktop"],
         "obsoletes": ["openlist-desktop"],
         "postInstallScript": "./packages/linux/post-install.sh",
-        "preRemoveScript": "./packages/linux/pre-remove.sh"
+        "preRemoveScript": "./packages/linux/pre-remove.sh",
+        "files": {
+          "/opt/OpenList-Desktop/openlist-desktop": "usr/bin/openlist-desktop",
+          "/opt/OpenList-Desktop/install-openlist-service": "usr/bin/install-openlist-service",
+          "/opt/OpenList-Desktop/uninstall-openlist-service": "usr/bin/uninstall-openlist-service",
+          "/opt/OpenList-Desktop/openlist-desktop-service": "usr/bin/openlist-desktop-service",
+          "/opt/OpenList-Desktop/openlist": "usr/bin/openlist",
+          "/opt/OpenList-Desktop/rclone": "usr/bin/rclone"
+        }
       }
     },
     "externalBin": [

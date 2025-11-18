@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/bin/uninstall-openlist-service
+/opt/OpenList-Desktop/uninstall-openlist-service
