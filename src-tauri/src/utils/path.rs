@@ -115,7 +115,26 @@ pub fn get_openlist_binary_path() -> Result<PathBuf, String> {
 }
 
 pub fn get_rclone_binary_path() -> Result<PathBuf, String> {
-    get_binary_path("rclone", "Rclone")
+    // First, check if rclone is bundled with the app
+    if let Ok(bundled_path) = get_binary_path("rclone", "Rclone") {
+        return Ok(bundled_path);
+    }
+
+    // Fallback: find rclone in system PATH (Linux/macOS)
+    #[cfg(not(target_os = "windows"))]
+    {
+        use std::process::Command;
+        if let Ok(output) = Command::new("which").arg("rclone").output() {
+            if output.status.success() {
+                let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                if !path_str.is_empty() {
+                    return Ok(PathBuf::from(path_str));
+                }
+            }
+        }
+    }
+
+    Err("Rclone not found. Please install it from https://rclone.org/install/".to_string())
 }
 
 pub fn get_app_config_dir() -> Result<PathBuf, String> {

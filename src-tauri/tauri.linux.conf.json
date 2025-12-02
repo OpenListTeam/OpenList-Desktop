@@ -6,6 +6,7 @@
     "linux": {
       "deb": {
         "depends": ["openssl"],
+        "recommends": ["rclone"],
         "desktopTemplate": "./packages/linux/openlist.desktop",
         "provides": ["openlist-desktop"],
         "conflicts": ["openlist-desktop"],
@@ -15,6 +16,7 @@
       },
       "rpm": {
         "depends": ["openssl"],
+        "recommends": ["rclone"],
         "desktopTemplate": "./packages/linux/openlist.desktop",
         "provides": ["openlist-desktop"],
         "conflicts": ["openlist-desktop"],
@@ -27,8 +29,7 @@
       "./binary/install-openlist-service",
       "./binary/uninstall-openlist-service",
       "./binary/openlist-desktop-service",
-      "./binary/openlist",
-      "./binary/rclone"
+      "./binary/openlist"
     ]
   }
 }

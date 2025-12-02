@@ -249,12 +249,19 @@ async function main() {
     )
   )
 
-  await retryTask('rclone', async () => {
-    await getLatestRcloneVersion()
-    await resolveSidecar(
-      createBinaryInfo('rclone', getRcloneArchMap(rcloneVersion), `https://downloads.rclone.org`, rcloneVersion)
-    )
-  })
+  // Only bundle rclone for Windows and macOS, Linux users should install rclone from system package manager
+  const isLinux = platform === 'linux'
+  if (!isLinux) {
+    await retryTask('rclone', async () => {
+      await getLatestRcloneVersion()
+      await resolveSidecar(
+        createBinaryInfo('rclone', getRcloneArchMap(rcloneVersion), `https://downloads.rclone.org`, rcloneVersion)
+      )
+    })
+  } else {
+    console.log('Skipping rclone download for Linux - users should install rclone from system package manager')
+  }
+
   if (isWin) {
     await resolvePlugins()
   }
