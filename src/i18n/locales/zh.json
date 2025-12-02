@@ -468,6 +468,8 @@
       "webdavMessage": "在挂载远程存储之前，请确保在 OpenList 核心中为用户启用了 WebDAV 管理功能",
       "winfspTitle": "需要安装 WinFSP",
       "winfspMessage": "在 Windows 系统上，您需要先安装 WinFSP 才能使用挂载功能。请从 GitHub 下载并安装：https://github.com/winfsp/winfsp/releases",
+      "rcloneTitle": "需要安装 Rclone",
+      "rcloneMessage": "在 Linux 系统上，rclone 不随应用程序捆绑。请使用包管理器安装（例如：sudo apt install rclone）或从 https://rclone.org/install/ 下载安装",
       "dismissForever": "永久关闭"
     }
   },

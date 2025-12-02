@@ -7,6 +7,7 @@ export const useRcloneStore = defineStore('rclone', () => {
   const loading = ref(false)
   const error = ref<string | undefined>()
   const serviceRunning = ref(false)
+  const rcloneAvailable = ref(true)
 
   const setError = (msg?: string) => (error.value = msg)
 
@@ -65,16 +66,27 @@ export const useRcloneStore = defineStore('rclone', () => {
     return running
   }
 
-  const init = () => console.log('Initializing Rclone store...')
+  const checkRcloneAvailable = async () => {
+    const available = await TauriAPI.rclone.backend.isAvailable().catch(() => false)
+    rcloneAvailable.value = available
+    return available
+  }
+
+  const init = () => {
+    console.log('Initializing Rclone store...')
+    checkRcloneAvailable()
+  }
 
   return {
     loading,
     error,
     serviceRunning,
+    rcloneAvailable,
     clearError,
     startRcloneBackend,
     stopRcloneBackend,
     checkRcloneBackendStatus,
+    checkRcloneAvailable,
     init
   }
 })

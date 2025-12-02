@@ -11,6 +11,11 @@ use crate::utils::path::{get_app_logs_dir, get_rclone_binary_path, get_rclone_co
 pub const RCLONE_AUTH: &str = "Basic YWRtaW46YWRtaW4=";
 
 #[tauri::command]
+pub async fn check_rclone_available() -> Result<bool, String> {
+    get_rclone_binary_path().map(|_| true).or(Ok(false))
+}
+
+#[tauri::command]
 pub async fn create_and_start_rclone_backend(
     state: State<'_, AppState>,
 ) -> Result<ProcessConfig, String> {

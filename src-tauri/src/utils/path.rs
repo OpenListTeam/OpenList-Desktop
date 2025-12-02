@@ -124,12 +124,12 @@ pub fn get_rclone_binary_path() -> Result<PathBuf, String> {
     #[cfg(not(target_os = "windows"))]
     {
         use std::process::Command;
-        if let Ok(output) = Command::new("which").arg("rclone").output() {
-            if output.status.success() {
-                let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
-                if !path_str.is_empty() {
-                    return Ok(PathBuf::from(path_str));
-                }
+        if let Ok(output) = Command::new("which").arg("rclone").output()
+            && output.status.success()
+        {
+            let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            if !path_str.is_empty() {
+                return Ok(PathBuf::from(path_str));
             }
         }
     }

@@ -468,6 +468,8 @@
       "webdavMessage": "Before mounting remotes, please ensure WebDAV management for specific user is enabled in OpenList Core.",
       "winfspTitle": "WinFSP Installation Required",
       "winfspMessage": "On Windows, you need to install WinFSP first to use mount functionality. Please download and install it from GitHub: https://github.com/winfsp/winfsp/releases",
+      "rcloneTitle": "Rclone Installation Required",
+      "rcloneMessage": "On Linux, rclone is not bundled with the application. Please install it using your package manager (e.g., sudo apt install rclone) or from https://rclone.org/install/",
       "dismissForever": "Dismiss forever"
     }
   },

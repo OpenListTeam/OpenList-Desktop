@@ -36,7 +36,8 @@ export class TauriAPI {
     backend: {
       create: (): Promise<boolean> => call('create_rclone_backend_process'),
       createAndStart: (): Promise<ProcessConfig> => call('create_and_start_rclone_backend'),
-      isRunning: (): Promise<boolean> => call('get_rclone_backend_status')
+      isRunning: (): Promise<boolean> => call('get_rclone_backend_status'),
+      isAvailable: (): Promise<boolean> => call('check_rclone_available')
     },
     remotes: {
       list: (): Promise<string[]> => call('rclone_list_remotes'),

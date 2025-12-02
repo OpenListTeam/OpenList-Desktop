@@ -465,9 +465,22 @@ const dismissWinfspTip = () => {
   localStorage.setItem('winfsp_tip_dismissed', 'true')
 }
 
+const isLinux = computed(() => {
+  return typeof OS_PLATFORM !== 'undefined' && OS_PLATFORM === 'linux'
+})
+const showRcloneTip = ref(false)
+
+const dismissRcloneTip = () => {
+  showRcloneTip.value = false
+  localStorage.setItem('rclone_tip_dismissed', 'true')
+}
+
 const shouldShowWebdavTip = computed(() => {
   if (isWindows.value) {
     return !showWinfspTip.value && showWebdavTip.value
+  }
+  if (isLinux.value && showRcloneTip.value) {
+    return false
   }
   return showWebdavTip.value
 })
@@ -482,6 +495,12 @@ onMounted(async () => {
     rcloneStore.checkRcloneBackendStatus()
   }, 15 * 1000)
   rcloneStore.init()
+
+  // Check rclone availability on Linux
+  if (isLinux.value && !localStorage.getItem('rclone_tip_dismissed')) {
+    const available = await rcloneStore.checkRcloneAvailable()
+    showRcloneTip.value = !available
+  }
 })
 
 onUnmounted(() => {
@@ -575,6 +594,21 @@ onUnmounted(() => {
           <p class="tip-description">{{ t('mount.tip.winfspMessage') }}</p>
         </div>
         <button class="tip-close" :title="t('mount.tip.dismissForever')" @click="dismissWinfspTip">
+          <X class="close-icon" />
+        </button>
+      </div>
+    </div>
+
+    <div v-if="showRcloneTip" class="rclone-tip">
+      <div class="tip-content">
+        <div class="tip-icon">
+          <HardDrive class="icon" />
+        </div>
+        <div class="tip-message">
+          <h4 class="tip-title">{{ t('mount.tip.rcloneTitle') }}</h4>
+          <p class="tip-description">{{ t('mount.tip.rcloneMessage') }}</p>
+        </div>
+        <button class="tip-close" :title="t('mount.tip.dismissForever')" @click="dismissRcloneTip">
           <X class="close-icon" />
         </button>
       </div>

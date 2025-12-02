@@ -1570,6 +1570,88 @@
   color: #60a5fa;
 }
 
+/* Rclone tip - orange theme for Linux */
+.rclone-tip {
+  position: relative;
+  z-index: 1;
+  margin: 0 28px 12px;
+  background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+  border: 1px solid #f97316;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(249, 115, 22, 0.1);
+  overflow: hidden;
+}
+
+.rclone-tip .tip-icon {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.rclone-tip .tip-icon .icon {
+  color: #c2410c;
+}
+
+.rclone-tip .tip-title {
+  color: #9a3412;
+}
+
+.rclone-tip .tip-description {
+  color: #c2410c;
+}
+
+.rclone-tip .tip-close {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.rclone-tip .tip-close:hover {
+  background: rgba(249, 115, 22, 0.2);
+}
+
+.rclone-tip .tip-close .close-icon {
+  color: #c2410c;
+}
+
+:root.dark .rclone-tip,
+:root.auto.dark .rclone-tip {
+  background: linear-gradient(135deg, #431407 0%, #7c2d12 100%);
+  border-color: #f97316;
+  box-shadow: 0 1px 4px rgba(249, 115, 22, 0.1);
+}
+
+:root.dark .rclone-tip .tip-icon,
+:root.auto.dark .rclone-tip .tip-icon {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+:root.dark .rclone-tip .tip-icon .icon,
+:root.auto.dark .rclone-tip .tip-icon .icon {
+  color: #fb923c;
+}
+
+:root.dark .rclone-tip .tip-title,
+:root.auto.dark .rclone-tip .tip-title {
+  color: #fdba74;
+}
+
+:root.dark .rclone-tip .tip-description,
+:root.auto.dark .rclone-tip .tip-description {
+  color: #fb923c;
+}
+
+:root.dark .rclone-tip .tip-close,
+:root.auto.dark .rclone-tip .tip-close {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+:root.dark .rclone-tip .tip-close:hover,
+:root.auto.dark .rclone-tip .tip-close:hover {
+  background: rgba(249, 115, 22, 0.2);
+}
+
+:root.dark .rclone-tip .tip-close .close-icon,
+:root.auto.dark .rclone-tip .tip-close .close-icon {
+  color: #fb923c;
+}
+
 @media (max-width: 1024px) {
   .header-content {
     grid-template-columns: 1fr;

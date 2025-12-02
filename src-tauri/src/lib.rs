@@ -27,7 +27,8 @@ use cmd::os_operate::{
     open_url_in_browser, select_directory, update_tool_version,
 };
 use cmd::rclone_core::{
-    create_and_start_rclone_backend, create_rclone_backend_process, get_rclone_backend_status,
+    check_rclone_available, create_and_start_rclone_backend, create_rclone_backend_process,
+    get_rclone_backend_status,
 };
 use cmd::rclone_mount::{
     check_mount_status, create_rclone_mount_remote_process, get_mount_info_list,
@@ -126,6 +127,7 @@ pub fn run() {
             create_openlist_core_process,
             get_openlist_core_status,
             get_rclone_backend_status,
+            check_rclone_available,
             create_rclone_backend_process,
             create_and_start_rclone_backend,
             rclone_list_config,
