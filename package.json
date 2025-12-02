@@ -102,7 +102,9 @@
     "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^3.0.6"
   },
-  "overrides": {
-    "tmp": "^0.2.4"
+  "resolutions": {
+    "tmp": "^0.2.4",
+    "js-yaml": "^4.1.1",
+    "glob": "^10.5.0"
   }
 }
