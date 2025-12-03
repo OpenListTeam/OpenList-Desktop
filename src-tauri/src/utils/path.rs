@@ -118,7 +118,7 @@ pub fn get_rclone_binary_path() -> Result<PathBuf, String> {
     // Windows/macOS: rclone is bundled with the app
     #[cfg(not(target_os = "linux"))]
     {
-        return get_binary_path("rclone", "Rclone");
+        get_binary_path("rclone", "Rclone")
     }
 
     // Linux: rclone is not bundled, find it in system PATH
