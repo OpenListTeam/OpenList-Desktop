@@ -133,7 +133,11 @@ pub fn get_rclone_binary_path() -> Result<PathBuf, String> {
                 return Ok(PathBuf::from(path_str));
             }
         }
-        Err("Rclone not found. Please install it via your package manager (e.g., apt install rclone)".to_string())
+        Err(
+            "Rclone not found. Please install it via your package manager (e.g., apt install \
+             rclone)"
+                .to_string(),
+        )
     }
 }
 
