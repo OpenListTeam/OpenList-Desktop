@@ -29,6 +29,13 @@
       "exceptionDomain": "",
       "signingIdentity": null,
       "entitlements": "packages/macos/entitlements.plist"
-    }
+    },
+    "externalBin": [
+      "./binary/install-openlist-service",
+      "./binary/uninstall-openlist-service",
+      "./binary/openlist-desktop-service",
+      "./binary/openlist",
+      "./binary/rclone"
+    ]
   }
 }

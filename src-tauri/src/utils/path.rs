@@ -115,13 +115,13 @@ pub fn get_openlist_binary_path() -> Result<PathBuf, String> {
 }
 
 pub fn get_rclone_binary_path() -> Result<PathBuf, String> {
-    // First, check if rclone is bundled with the app
+    // First, check if rclone is bundled with the app (Windows/macOS)
     if let Ok(bundled_path) = get_binary_path("rclone", "Rclone") {
         return Ok(bundled_path);
     }
 
-    // Fallback: find rclone in system PATH (Linux/macOS)
-    #[cfg(not(target_os = "windows"))]
+    // Fallback: find rclone in system PATH (Linux only)
+    #[cfg(target_os = "linux")]
     {
         use std::process::Command;
         if let Ok(output) = Command::new("which").arg("rclone").output()

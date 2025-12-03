@@ -18,6 +18,13 @@
         "installMode": "perMachine",
         "template": "./packages/windows/installer.nsi"
       }
-    }
+    },
+    "externalBin": [
+      "./binary/install-openlist-service",
+      "./binary/uninstall-openlist-service",
+      "./binary/openlist-desktop-service",
+      "./binary/openlist",
+      "./binary/rclone"
+    ]
   }
 }
