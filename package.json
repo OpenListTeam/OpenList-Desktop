@@ -80,7 +80,7 @@
     "@typescript-eslint/parser": "^8.41.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "adm-zip": "^0.5.16",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.0.0",
     "dpdm": "^3.14.0",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
