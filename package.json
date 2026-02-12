@@ -76,7 +76,7 @@
     "@typescript-eslint/parser": "^8.54.0",
     "@vitejs/plugin-vue": "^6.0.4",
     "adm-zip": "^0.5.16",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.0.0",
     "czg": "^1.12.0",
     "dpdm": "^3.14.0",
     "eslint": "^9.39.2",
