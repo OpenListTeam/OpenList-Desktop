@@ -98,9 +98,9 @@ export const useAppStore = defineStore('app', () => {
 
   const saveSettings = () => tryCatch(() => TauriAPI.settings.save(settings.value), 'Failed to save settings')
 
-  async function saveAndRestart(): Promise<boolean> {
+  async function saveAndRestart(updatePort = true): Promise<boolean> {
     try {
-      await TauriAPI.settings.saveAndRestart(settings.value)
+      await TauriAPI.settings.saveAndRestart(settings.value, updatePort)
       return true
     } catch (err) {
       error.value = 'Failed to save settings'

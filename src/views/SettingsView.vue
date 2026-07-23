@@ -366,6 +366,7 @@ const appSettings = reactive({ ...appStore.settings.app })
 let originalOpenlistPort = openlistCoreSettings.port || 5244
 let originalDataDir = openlistCoreSettings.data_dir
 let originalOpenListBinaryPath = openlistCoreSettings.binary_path || ''
+let originalSslEnabled = openlistCoreSettings.ssl_enabled
 let originalAdminPassword = appStore.settings.app.admin_password || ''
 
 const tabs = computed(() => [
@@ -405,15 +406,22 @@ const handleSave = async () => {
     appStore.settings.rclone = { ...rcloneSettings }
     appStore.settings.app = { ...appSettings }
 
+    const portChanged = originalOpenlistPort !== openlistCoreSettings.port
+    const sslChanged = originalSslEnabled !== openlistCoreSettings.ssl_enabled
+    const dataDirChanged = originalDataDir !== (openlistCoreSettings.data_dir || '')
+    const binaryPathChanged = originalOpenListBinaryPath !== (openlistCoreSettings.binary_path || '')
+    const needsRestart = portChanged || dataDirChanged || binaryPathChanged
     const needsPasswordUpdate = originalAdminPassword !== appSettings.admin_password && appSettings.admin_password
 
-    if (
-      originalOpenlistPort !== openlistCoreSettings.port ||
-      originalDataDir !== (openlistCoreSettings.data_dir || '') ||
-      originalOpenListBinaryPath !== (openlistCoreSettings.binary_path || '')
-    ) {
-      await appStore.saveAndRestart()
-    } else {
+    if (!portChanged && (sslChanged || dataDirChanged)) {
+      await appStore.saveSettings()
+      await appStore.loadSettings()
+      Object.assign(openlistCoreSettings, appStore.settings.openlist)
+    }
+
+    if (needsRestart) {
+      await appStore.saveAndRestart(portChanged || (!openlistCoreSettings.ssl_enabled && dataDirChanged))
+    } else if (!sslChanged) {
       await appStore.saveSettings()
     }
 
@@ -432,6 +440,7 @@ const handleSave = async () => {
     originalOpenlistPort = openlistCoreSettings.port || 5244
     originalDataDir = openlistCoreSettings.data_dir
     originalOpenListBinaryPath = openlistCoreSettings.binary_path || ''
+    originalSslEnabled = openlistCoreSettings.ssl_enabled
   } catch (error) {
     message.error(t('settings.saveFailed'))
     console.error('Save settings error:', error)

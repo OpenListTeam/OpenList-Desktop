@@ -98,13 +98,19 @@ pub async fn get_openlist_core_status(state: State<'_, AppState>) -> Result<Serv
 
     let health_url = format!("{health_check_url}/ping");
 
+    // OpenList commonly uses self-signed certificates for local HTTPS endpoints.
+    let client = reqwest::Client::builder()
+        .danger_accept_invalid_certs(openlist_config.ssl_enabled)
+        .build()
+        .map_err(|e| format!("Failed to create health check client: {e}"))?;
+
     // Get PID from process manager if available
     let local_pid = PROCESS_MANAGER
         .get_status(OPENLIST_CORE_PROCESS_ID)
         .ok()
         .and_then(|info| info.pid);
 
-    match reqwest::get(&health_url).await {
+    match client.get(&health_url).send().await {
         Ok(response) => {
             let is_running = response.status().is_success();
             Ok(ServiceStatus {
