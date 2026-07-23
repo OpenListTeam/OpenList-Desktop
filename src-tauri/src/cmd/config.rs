@@ -18,7 +18,7 @@ fn persist_app_settings(settings: &MergedSettings) -> Result<(), String> {
     write_json_to_file(path, settings)
 }
 
-fn update_data_config(port: u16, data_dir: Option<&str>, ssl_enabled: bool) -> Result<(), String> {
+fn update_data_config(port: u16, data_dir: Option<&str>) -> Result<(), String> {
     let data_config_path = if let Some(dir) = data_dir.filter(|d| !d.is_empty()) {
         PathBuf::from(dir).join("config.json")
     } else {
@@ -33,17 +33,14 @@ fn update_data_config(port: u16, data_dir: Option<&str>, ssl_enabled: bool) -> R
         let s = fs::read_to_string(&data_config_path).map_err(|e| e.to_string())?;
         serde_json::from_str::<serde_json::Value>(&s).map_err(|e| e.to_string())?
     } else {
-        serde_json::json!({ "scheme": {} })
+        serde_json::json!({ "scheme": { "http_port": port } })
     };
 
-    let port_key = if ssl_enabled { "https_port" } else { "http_port" };
-    let scheme = cfg_value.get_mut("scheme").and_then(|value| value.as_object_mut());
+    let scheme = cfg_value.get_mut("scheme").and_then(|v| v.as_object_mut());
     if let Some(obj) = scheme {
-        obj.insert(port_key.into(), serde_json::json!(port));
+        obj.insert("http_port".into(), serde_json::json!(port));
     } else {
-        let mut scheme = serde_json::Map::new();
-        scheme.insert(port_key.into(), serde_json::json!(port));
-        cfg_value["scheme"] = serde_json::Value::Object(scheme);
+        cfg_value["scheme"] = serde_json::json!({ "http_port": port });
     }
 
     write_json_to_file(data_config_path, &cfg_value)
@@ -69,7 +66,6 @@ pub async fn save_settings(
 #[tauri::command]
 pub async fn save_settings_and_restart(
     settings: MergedSettings,
-    update_port: bool,
     state: State<'_, AppState>,
 ) -> Result<bool, String> {
     state.update_settings(settings.clone());
@@ -79,13 +75,7 @@ pub async fn save_settings_and_restart(
     } else {
         Some(settings.openlist.data_dir.as_str())
     };
-    if update_port {
-        update_data_config(
-            settings.openlist.port,
-            data_dir,
-            settings.openlist.ssl_enabled,
-        )?;
-    }
+    update_data_config(settings.openlist.port, data_dir)?;
     if let Ok(info) = get_openlist_core_process_status().await
         && info.is_running
     {

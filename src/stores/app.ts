@@ -70,7 +70,8 @@ export const useAppStore = defineStore('app', () => {
   const isCoreRunning = computed(() => openlistCoreStatus.value.running)
   const openListCoreUrl = computed(() => {
     const protocol = settings.value.openlist.ssl_enabled ? 'https' : 'http'
-    return `${protocol}://localhost:${settings.value.openlist.port}`
+    const port = openlistCoreStatus.value.port || settings.value.openlist.port
+    return `${protocol}://localhost:${port}`
   })
 
   // Helper
@@ -98,9 +99,9 @@ export const useAppStore = defineStore('app', () => {
 
   const saveSettings = () => tryCatch(() => TauriAPI.settings.save(settings.value), 'Failed to save settings')
 
-  async function saveAndRestart(updatePort = true): Promise<boolean> {
+  async function saveAndRestart(): Promise<boolean> {
     try {
-      await TauriAPI.settings.saveAndRestart(settings.value, updatePort)
+      await TauriAPI.settings.saveAndRestart(settings.value)
       return true
     } catch (err) {
       error.value = 'Failed to save settings'
