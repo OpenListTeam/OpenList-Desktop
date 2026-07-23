@@ -43,7 +43,7 @@ async function getLatestRcloneVersion() {
 }
 
 // openlist version management
-let openlistVersion = 'v4.0.8'
+let openlistVersion = 'v4.2.4'
 
 async function getLatestOpenlistVersion() {
   try {
@@ -52,7 +52,7 @@ async function getLatestOpenlistVersion() {
       getFetchOptions(),
     )
     const data = await response.json()
-    openlistVersion = data.tag_name || 'v4.0.8'
+    openlistVersion = data.tag_name || 'v4.2.4'
     console.log(`Latest OpenList version: ${openlistVersion}`)
   } catch (error) {
     console.log('Error fetching latest OpenList version:', error.message)
