@@ -117,7 +117,7 @@ pub async fn get_openlist_core_status(state: State<'_, AppState>) -> Result<Serv
 
     // OpenList commonly uses self-signed certificates for local HTTPS endpoints.
     let client = reqwest::Client::builder()
-        .danger_accept_invalid_certs(openlist_config.ssl_enabled)
+        .tls_danger_accept_invalid_certs(openlist_config.ssl_enabled)
         .build()
         .map_err(|e| format!("Failed to create health check client: {e}"))?;
 
