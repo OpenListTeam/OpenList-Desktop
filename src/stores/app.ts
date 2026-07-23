@@ -49,7 +49,7 @@ export const useAppStore = defineStore('app', () => {
   const mountedConfigs = computed(() => mountInfos.value.filter(mount => mount.status === 'mounted'))
 
   const fullRcloneConfigs = computed<RcloneFormConfig[]>(() => {
-    const mountConfig = settings.value.rclone.mount_config
+    const mountConfig = settings.value.rclone.mount_config || {}
     return Object.entries(remoteConfigs.value).map(([key, config]) => {
       const saved = mountConfig[key]
       return {
@@ -88,7 +88,10 @@ export const useAppStore = defineStore('app', () => {
   const loadSettings = () => {
     return tryCatch(async () => {
       const res = await TauriAPI.settings.load()
-      if (res) settings.value = res
+      if (res) {
+        res.rclone.mount_config ||= {}
+        settings.value = res
+      }
       applyTheme(settings.value.app.theme || 'light')
     }, 'Failed to load settings')
   }
@@ -109,7 +112,10 @@ export const useAppStore = defineStore('app', () => {
   const resetSettings = () =>
     tryCatch(async () => {
       const res = await TauriAPI.settings.reset()
-      if (res) settings.value = res
+      if (res) {
+        res.rclone.mount_config ||= {}
+        settings.value = res
+      }
     }, 'Failed to reset settings')
 
   async function loadMountInfos() {
