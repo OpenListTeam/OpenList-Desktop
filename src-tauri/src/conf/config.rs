@@ -48,7 +48,11 @@ impl MergedSettings {
         ssl_enabled: bool,
     ) -> Result<Option<u16>, String> {
         let config = Self::read_data_config_for_dir(data_dir)?;
-        let port_key = if ssl_enabled { "https_port" } else { "http_port" };
+        let port_key = if ssl_enabled {
+            "https_port"
+        } else {
+            "http_port"
+        };
         Ok(config
             .get("scheme")
             .and_then(|scheme| scheme.get(port_key))
