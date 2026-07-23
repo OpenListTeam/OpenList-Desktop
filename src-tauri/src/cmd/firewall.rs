@@ -57,22 +57,23 @@ fn firewall_rule(verb: &str, port: Option<u16>) -> Result<bool, String> {
 }
 
 #[cfg(target_os = "windows")]
-fn rule_stdout() -> Result<Option<String>, String> {
-    let out = Command::new("netsh")
-        .args([
-            "advfirewall",
-            "firewall",
-            "show",
-            "rule",
-            &format!("name={RULE}"),
-        ])
+fn firewall_rule_exists(port: u16) -> Result<bool, String> {
+    let script = format!(
+        "try {{ $rules = (New-Object -ComObject HNetCfg.FwPolicy2).Rules; foreach ($rule in \
+         $rules) {{ if ($rule.Name -eq '{RULE}' -and $rule.Enabled -and $rule.Direction -eq 1 \
+         -and $rule.Action -eq 1 -and $rule.Protocol -eq 6 -and $rule.LocalPorts -eq '{port}') {{ \
+         exit 0 }} }}; exit 1 }} catch {{ exit 2 }}"
+    );
+    let status = Command::new("powershell")
+        .args(["-NoProfile", "-NonInteractive", "-Command", &script])
         .creation_flags(0x08000000)
-        .output()
-        .map_err(|e| format!("netsh: {e}"))?;
-    if out.status.success() {
-        Ok(Some(String::from_utf8_lossy(&out.stdout).into()))
-    } else {
-        Ok(None)
+        .status()
+        .map_err(|e| format!("powershell: {e}"))?;
+    match status.code() {
+        Some(0) => Ok(true),
+        Some(1) => Ok(false),
+        Some(code) => Err(format!("powershell exited with status {code}")),
+        None => Err("powershell terminated without an exit code".into()),
     }
 }
 
@@ -81,8 +82,8 @@ fn firewall_rule(_: &str, _: Option<u16>) -> Result<bool, String> {
     Ok(true)
 }
 #[cfg(not(target_os = "windows"))]
-fn rule_stdout() -> Result<Option<String>, String> {
-    Ok(None)
+fn firewall_rule_exists(_: u16) -> Result<bool, String> {
+    Ok(false)
 }
 
 #[tauri::command]
@@ -95,14 +96,7 @@ pub async fn check_firewall_rule(state: State<'_, AppState>) -> Result<bool, Str
         .openlist
         .port;
 
-    if let Some(out) = rule_stdout()? {
-        let rule_exists = out.contains(&format!("LocalPort: {port}"))
-            && out.contains("Action: Allow")
-            && out.contains("Protocol: TCP");
-        Ok(rule_exists)
-    } else {
-        Ok(false)
-    }
+    firewall_rule_exists(port)
 }
 
 #[tauri::command]
@@ -114,6 +108,10 @@ pub async fn add_firewall_rule(state: State<'_, AppState>) -> Result<bool, Strin
         .ok_or("read settings")?
         .openlist
         .port;
+
+    if firewall_rule_exists(port)? {
+        return Ok(true);
+    }
 
     let _ = firewall_rule("delete", None);
     firewall_rule("add", Some(port))
