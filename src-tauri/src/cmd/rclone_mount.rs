@@ -34,6 +34,45 @@ pub fn get_mount_process_id(remote_name: &str) -> String {
     format!("rclone_mount_{remote_name}_process")
 }
 
+fn ensure_vfs_write_cache(args: &mut Vec<String>) {
+    let has_cache_mode = args
+        .iter()
+        .any(|arg| arg == "--vfs-cache-mode" || arg.starts_with("--vfs-cache-mode="));
+    if !has_cache_mode {
+        args.push("--vfs-cache-mode=writes".into());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ensure_vfs_write_cache;
+
+    #[test]
+    fn adds_default_vfs_write_cache() {
+        let mut args = vec!["remote:".into(), "mount-point".into()];
+
+        ensure_vfs_write_cache(&mut args);
+
+        assert_eq!(args.last().unwrap(), "--vfs-cache-mode=writes");
+    }
+
+    #[test]
+    fn preserves_explicit_vfs_cache_mode() {
+        for cache_mode in [
+            vec!["--vfs-cache-mode=full".into()],
+            vec!["--vfs-cache-mode".into(), "off".into()],
+        ] {
+            let mut args = vec!["remote:".into(), "mount-point".into()];
+            args.extend(cache_mode);
+            let expected = args.clone();
+
+            ensure_vfs_write_cache(&mut args);
+
+            assert_eq!(args, expected);
+        }
+    }
+}
+
 #[cfg(target_os = "macos")]
 fn get_libfuse_path() -> Option<String> {
     [
@@ -180,7 +219,8 @@ pub async fn mount_remote(
     let rclone_conf_path = get_rclone_config_path_with_custom(state)
         .map_err(|e| format!("Failed to get rclone config path: {e}"))?;
 
-    let args_vec = split_args_vec(config.args.clone());
+    let mut args_vec = split_args_vec(config.args.clone());
+    ensure_vfs_write_cache(&mut args_vec);
 
     let mount_point_opt = args_vec.iter().filter(|arg| !arg.starts_with('-')).nth(1);
 
