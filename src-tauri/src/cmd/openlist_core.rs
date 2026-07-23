@@ -1,7 +1,7 @@
 use tauri::State;
 use tokio::time::{Duration, sleep};
-use url::Url;
 
+use crate::conf::config::MergedSettings;
 use crate::core::process_manager::{PROCESS_MANAGER, ProcessConfig, ProcessInfo};
 use crate::object::structs::{AppState, ServiceStatus};
 use crate::utils::path::{
@@ -89,14 +89,37 @@ pub async fn get_openlist_core_status(state: State<'_, AppState>) -> Result<Serv
     } else {
         "http"
     };
+    let data_dir = if openlist_config.data_dir.is_empty() {
+        None
+    } else {
+        Some(openlist_config.data_dir.as_str())
+    };
+    let port = if openlist_config.ssl_enabled {
+        MergedSettings::get_port_from_data_config_for_dir(data_dir, true)
+            .ok()
+            .flatten()
+    } else {
+        Some(openlist_config.port)
+    };
 
-    let health_check_url = format!("{}://localhost:{}", protocol, openlist_config.port);
-
-    let url =
-        Url::parse(&health_check_url).map_err(|e| format!("Invalid health check URL: {e}"))?;
-    let port = url.port_or_known_default();
-
+    let Some(port) = port else {
+        return Ok(ServiceStatus {
+            running: false,
+            pid: PROCESS_MANAGER
+                .get_status(OPENLIST_CORE_PROCESS_ID)
+                .ok()
+                .and_then(|info| info.pid),
+            port: None,
+        });
+    };
+    let health_check_url = format!("{protocol}://localhost:{port}");
     let health_url = format!("{health_check_url}/ping");
+
+    // OpenList commonly uses self-signed certificates for local HTTPS endpoints.
+    let client = reqwest::Client::builder()
+        .tls_danger_accept_invalid_certs(openlist_config.ssl_enabled)
+        .build()
+        .map_err(|e| format!("Failed to create health check client: {e}"))?;
 
     // Get PID from process manager if available
     let local_pid = PROCESS_MANAGER
@@ -104,19 +127,19 @@ pub async fn get_openlist_core_status(state: State<'_, AppState>) -> Result<Serv
         .ok()
         .and_then(|info| info.pid);
 
-    match reqwest::get(&health_url).await {
+    match client.get(&health_url).send().await {
         Ok(response) => {
             let is_running = response.status().is_success();
             Ok(ServiceStatus {
                 running: is_running,
                 pid: local_pid,
-                port,
+                port: Some(port),
             })
         }
         Err(_) => Ok(ServiceStatus {
             running: false,
             pid: local_pid,
-            port,
+            port: Some(port),
         }),
     }
 }

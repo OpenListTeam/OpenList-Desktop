@@ -69,8 +69,10 @@ export const useAppStore = defineStore('app', () => {
 
   const isCoreRunning = computed(() => openlistCoreStatus.value.running)
   const openListCoreUrl = computed(() => {
-    const protocol = settings.value.openlist.ssl_enabled ? 'https' : 'http'
-    return `${protocol}://localhost:${settings.value.openlist.port}`
+    const sslEnabled = settings.value.openlist.ssl_enabled
+    const protocol = sslEnabled ? 'https' : 'http'
+    const port = openlistCoreStatus.value.port || (!sslEnabled ? settings.value.openlist.port : undefined)
+    return port ? `${protocol}://localhost:${port}` : ''
   })
 
   // Helper

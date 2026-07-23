@@ -43,13 +43,22 @@ impl MergedSettings {
         serde_json::from_str(&content).map_err(|e| e.to_string())
     }
 
-    fn get_port_from_data_config_for_dir(data_dir: Option<&str>) -> Result<Option<u16>, String> {
+    pub(crate) fn get_port_from_data_config_for_dir(
+        data_dir: Option<&str>,
+        ssl_enabled: bool,
+    ) -> Result<Option<u16>, String> {
         let config = Self::read_data_config_for_dir(data_dir)?;
+        let port_key = if ssl_enabled {
+            "https_port"
+        } else {
+            "http_port"
+        };
         Ok(config
             .get("scheme")
-            .and_then(|s| s.get("http_port"))
-            .and_then(|p| p.as_u64())
-            .map(|p| p as u16))
+            .and_then(|scheme| scheme.get(port_key))
+            .and_then(|port| port.as_u64())
+            .filter(|port| (1..=u16::MAX as u64).contains(port))
+            .map(|port| port as u16))
     }
 
     pub fn save(&self) -> Result<(), String> {
@@ -82,7 +91,7 @@ impl MergedSettings {
             Some(settings.openlist.data_dir.as_str())
         };
 
-        if let Ok(Some(port)) = Self::get_port_from_data_config_for_dir(data_dir)
+        if let Ok(Some(port)) = Self::get_port_from_data_config_for_dir(data_dir, false)
             && settings.openlist.port != port
         {
             settings.openlist.port = port;
