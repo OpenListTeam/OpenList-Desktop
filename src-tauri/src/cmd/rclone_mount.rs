@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+#[cfg(target_os = "macos")]
 use std::env;
 use std::fs;
 use std::path::Path;
