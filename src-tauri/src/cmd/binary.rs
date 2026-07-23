@@ -32,12 +32,12 @@ pub async fn get_binary_version(
 
     let output = cmd
         .output()
-        .map_err(|e| format!("Failed to spawn {:?}: {}", &binary_path, e))?;
+        .map_err(|e| format!("Failed to spawn {:?}: {}", binary_path, e))?;
 
     if !output.status.success() {
         return Err(format!(
             "{:?} exited with status: {}",
-            &binary_path, output.status
+            binary_path, output.status
         ));
     }
 

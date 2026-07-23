@@ -88,7 +88,10 @@ export const useAppStore = defineStore('app', () => {
   const loadSettings = () => {
     return tryCatch(async () => {
       const res = await TauriAPI.settings.load()
-      if (res) settings.value = res
+      if (res) {
+        res.rclone.mount_config ||= {}
+        settings.value = res
+      }
       applyTheme(settings.value.app.theme || 'light')
     }, 'Failed to load settings')
   }
