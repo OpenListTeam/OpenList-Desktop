@@ -59,10 +59,10 @@ fn firewall_rule(verb: &str, port: Option<u16>) -> Result<bool, String> {
 #[cfg(target_os = "windows")]
 fn firewall_rule_exists(port: u16) -> Result<bool, String> {
     let script = format!(
-        "try {{ $rules = (New-Object -ComObject HNetCfg.FwPolicy2).Rules; \
-         foreach ($rule in $rules) {{ if ($rule.Name -eq '{RULE}' -and $rule.Enabled \
-         -and $rule.Direction -eq 1 -and $rule.Action -eq 1 -and $rule.Protocol -eq 6 \
-         -and $rule.LocalPorts -eq '{port}') {{ exit 0 }} }}; exit 1 }} catch {{ exit 2 }}"
+        "try {{ $rules = (New-Object -ComObject HNetCfg.FwPolicy2).Rules; foreach ($rule in \
+         $rules) {{ if ($rule.Name -eq '{RULE}' -and $rule.Enabled -and $rule.Direction -eq 1 \
+         -and $rule.Action -eq 1 -and $rule.Protocol -eq 6 -and $rule.LocalPorts -eq '{port}') {{ \
+         exit 0 }} }}; exit 1 }} catch {{ exit 2 }}"
     );
     let status = Command::new("powershell")
         .args(["-NoProfile", "-NonInteractive", "-Command", &script])
