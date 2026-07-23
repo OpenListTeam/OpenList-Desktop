@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-#[cfg(target_os = "macos")]
-use std::env;
 use std::fs;
 use std::path::Path;
 
@@ -207,7 +205,7 @@ pub async fn mount_remote(
 
     let log_file = log_dir.join("process_rclone.log");
 
-    let env_vars = if env::var_os("CGOFUSE_LIBFUSE_PATH").is_none() {
+    let env_vars = if std::env::var_os("CGOFUSE_LIBFUSE_PATH").is_none() {
         get_libfuse_path().map(|path| HashMap::from([(String::from("CGOFUSE_LIBFUSE_PATH"), path)]))
     } else {
         None
