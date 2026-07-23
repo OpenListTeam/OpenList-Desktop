@@ -641,6 +641,12 @@ const commonFlags = [
       { flag: '--progress', value: '', descriptionKey: 'progress' },
     ],
   },
+  {
+    category: 'Windows Specific',
+    flags: [
+      { flag: '--volname', value: 'OpenlistDAV', descriptionKey: 'volname' },
+    ],
+  },
 ]
 
 const filterList = computed(() => [

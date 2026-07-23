@@ -209,7 +209,8 @@
         "vfs-cache-mode-writes": "Cache local writes, upload file contents after writing completes",
         "vfs-read-chunk-size": "Read chunk size (default 128M)",
         "webdav-bearer-token": "Custom bearer token",
-        "webdav-headers": "Set custom HTTP headers"
+        "webdav-headers": "Set custom HTTP headers",
+        "volname": "Set Windows volume name after mount"
       },
       "flagPlaceholder": "e.g., --vfs-cache-mode=full",
       "mountPoint": "Mount Path",

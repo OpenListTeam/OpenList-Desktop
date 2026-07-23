@@ -208,6 +208,7 @@
         "vfs-cache-mode-minimal": "只缓存文件的元信息",
         "vfs-cache-mode-writes": "缓存本地写入，文件内容写入完成后上传",
         "vfs-read-chunk-size": "读取块大小（默认 128M）",
+        "volname": "设置挂载后的windows卷名",
         "webdav-bearer-token": "自定义token",
         "webdav-headers": "设置自定义 HTTP 标头"
       },
