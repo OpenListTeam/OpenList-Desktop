@@ -55,7 +55,6 @@
       "resetAdminPassword": "重置管理员密码",
       "resetAdminPasswordFailed": "重置管理员密码失败。请查看日志了解详细信息。",
       "resetAdminPasswordSuccess": "管理员密码重置成功！新密码已复制到剪贴板。",
-      "restart": "重启",
       "startOpenListCore": "启动",
       "stopOpenListCore": "停止",
       "title": "核心管理"

@@ -55,7 +55,6 @@
       "resetAdminPassword": "Reset admin password",
       "resetAdminPasswordFailed": "Failed to reset admin password. Please check the logs for more details.",
       "resetAdminPasswordSuccess": "Admin password reset successfully! The new password has been copied to the clipboard.",
-      "restart": "Restart",
       "startOpenListCore": "Start",
       "stopOpenListCore": "Stop",
       "title": "Core Management"
