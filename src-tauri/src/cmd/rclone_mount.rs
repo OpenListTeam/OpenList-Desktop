@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::env;
 use std::fs;
 use std::path::Path;
 
@@ -32,6 +33,23 @@ pub struct MountProcessInput {
 
 pub fn get_mount_process_id(remote_name: &str) -> String {
     format!("rclone_mount_{remote_name}_process")
+}
+
+#[cfg(target_os = "macos")]
+fn get_libfuse_path() -> Option<String> {
+    [
+        "/opt/local/lib/libfuse.2.dylib",
+        "/opt/homebrew/lib/libfuse.2.dylib",
+        "/opt/homebrew/lib/libfuse-t.dylib",
+    ]
+    .iter()
+    .find(|path| Path::new(path).is_file())
+    .map(|path| (*path).to_string())
+}
+
+#[cfg(not(target_os = "macos"))]
+fn get_libfuse_path() -> Option<String> {
+    None
 }
 
 #[tauri::command]
@@ -188,6 +206,12 @@ pub async fn mount_remote(
 
     let log_file = log_dir.join("process_rclone.log");
 
+    let env_vars = if env::var_os("CGOFUSE_LIBFUSE_PATH").is_none() {
+        get_libfuse_path().map(|path| HashMap::from([(String::from("CGOFUSE_LIBFUSE_PATH"), path)]))
+    } else {
+        None
+    };
+
     let process_config = ProcessConfig {
         id: config.id.clone(),
         name: config.name.clone(),
@@ -197,7 +221,7 @@ pub async fn mount_remote(
         working_dir: binary_path
             .parent()
             .map(|p| p.to_string_lossy().into_owned()),
-        env_vars: None,
+        env_vars,
     };
 
     if PROCESS_MANAGER.is_registered(&config.id) {

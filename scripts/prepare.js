@@ -29,13 +29,13 @@ if (!getOpenlistArchMap[platformArch]) {
 }
 
 // Rclone version management
-let rcloneVersion = 'v1.70.3'
+let rcloneVersion = 'v1.72.1'
 const rcloneVersionUrl = 'https://github.com/rclone/rclone/releases/latest/download/version.txt'
 
 async function getLatestRcloneVersion() {
   try {
     const response = await fetch(rcloneVersionUrl, getFetchOptions())
-    rcloneVersion = (await response.text()).trim().replace('rclone ', '') || '1.70.1'
+    rcloneVersion = (await response.text()).trim().replace('rclone ', '') || 'v1.72.1'
     console.log(`Latest rclone version: ${rcloneVersion}`)
   } catch (error) {
     console.log('Error fetching latest rclone version:', error.message)
