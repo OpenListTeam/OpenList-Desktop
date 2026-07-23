@@ -122,7 +122,7 @@ const router = useRouter()
 const message = useMessage()
 const appStore = useAppStore()
 const firewallEnabled = ref(false)
-const firewallLoading = ref(false)
+const firewallLoading = ref(isWindows)
 const { isCoreRunning, isCoreLoading } = storeToRefs(appStore)
 
 const toggleCore = async () => {
@@ -172,6 +172,8 @@ const checkFirewallStatus = async () => {
     firewallEnabled.value = await TauriAPI.firewall.check()
   } catch (error) {
     console.error('Failed to check firewall status:', error)
+  } finally {
+    firewallLoading.value = false
   }
 }
 
@@ -180,11 +182,11 @@ const toggleFirewallRule = async () => {
   try {
     firewallLoading.value = true
     if (firewallEnabled.value) {
-      await TauriAPI.firewall.remove()
+      if (!(await TauriAPI.firewall.remove())) throw new Error('netsh command failed')
       firewallEnabled.value = false
       message.success(t('dashboard.quickActions.firewall.removed'))
     } else {
-      await TauriAPI.firewall.add()
+      if (!(await TauriAPI.firewall.add())) throw new Error('netsh command failed')
       firewallEnabled.value = true
       message.success(t('dashboard.quickActions.firewall.added'))
     }
