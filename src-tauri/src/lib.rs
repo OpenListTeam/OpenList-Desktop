@@ -104,33 +104,6 @@ fn is_local_openlist_url(url: &str) -> bool {
         .unwrap_or(false)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::is_local_openlist_url;
-
-    #[test]
-    fn identifies_local_openlist_urls() {
-        for url in [
-            "http://localhost:5244/dav/1",
-            "https://127.0.0.1:5244/dav/1",
-            "http://[::1]:5244/dav/1",
-        ] {
-            assert!(is_local_openlist_url(url));
-        }
-    }
-
-    #[test]
-    fn rejects_remote_openlist_urls() {
-        for url in [
-            "https://openlist.example.com/dav/1",
-            "http://192.168.1.10:5244/dav/1",
-            "not a url",
-        ] {
-            assert!(!is_local_openlist_url(url));
-        }
-    }
-}
-
 async fn auto_start_openlist_core_on_login(app_handle: &tauri::AppHandle) -> Result<(), String> {
     let app_state = app_handle.state::<AppState>();
     let settings = app_state
@@ -408,4 +381,31 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_local_openlist_url;
+
+    #[test]
+    fn identifies_local_openlist_urls() {
+        for url in [
+            "http://localhost:5244/dav/1",
+            "https://127.0.0.1:5244/dav/1",
+            "http://[::1]:5244/dav/1",
+        ] {
+            assert!(is_local_openlist_url(url));
+        }
+    }
+
+    #[test]
+    fn rejects_remote_openlist_urls() {
+        for url in [
+            "https://openlist.example.com/dav/1",
+            "http://192.168.1.10:5244/dav/1",
+            "not a url",
+        ] {
+            assert!(!is_local_openlist_url(url));
+        }
+    }
 }
