@@ -34,6 +34,7 @@ use tauri::Emitter;
 
 use crate::cmd::rclone_mount::{MountProcessInput, get_mount_process_id};
 use crate::conf::rclone::RcloneMountConfig;
+use crate::conf::rclone_config::RcloneConfigFile;
 
 #[tauri::command]
 async fn update_tray_menu(
@@ -178,11 +179,21 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
         log::info!("No Rclone remotes configured for auto-mount on login");
         return Ok(());
     }
-    if !settings.openlist.auto_launch
-        && remotes_to_mount
-            .iter()
-            .any(|remote| is_local_openlist_url(&remote.url))
-    {
+    let has_local_remote = RcloneConfigFile::load_with_custom(app_state.clone())
+        .map(|config| {
+            remotes_to_mount.iter().any(|remote| {
+                config
+                    .remotes
+                    .get(&remote.name)
+                    .and_then(|remote| remote.options.get("url"))
+                    .is_some_and(|url| is_local_openlist_url(url))
+            })
+        })
+        .unwrap_or_else(|e| {
+            log::error!("Failed to load Rclone config before mounting remotes: {e}");
+            false
+        });
+    if !settings.openlist.auto_launch && has_local_remote {
         log::info!("Trying to auto-start OpenList Core before mounting local remotes");
         match start_openlist_core(app_state.clone()).await {
             Ok(_) => {
