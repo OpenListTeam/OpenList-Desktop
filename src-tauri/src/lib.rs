@@ -139,15 +139,6 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
         log::info!("No Rclone remotes configured for auto-mount on login");
         return Ok(());
     }
-    log::info!("Trying to auto-start OpenList Core before mounting remotes");
-    match start_openlist_core(app_state.clone()).await {
-        Ok(_) => {
-            log::info!("OpenList Core process started successfully before mounting remotes");
-        }
-        Err(e) => {
-            log::error!("Failed to start OpenList Core process before mounting remotes: {e}");
-        }
-    }
     for remote in remotes_to_mount {
         log::info!(
             "Auto-mount on login is enabled for remote '{}', attempting to mount",
