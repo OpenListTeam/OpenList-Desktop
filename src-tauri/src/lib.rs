@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use tauri::Manager;
+use url::{Host, Url};
 
 mod cmd;
 mod conf;
@@ -91,6 +92,44 @@ fn setup_background_update_checker(app_handle: &tauri::AppHandle) {
     });
 }
 
+fn is_local_openlist_url(url: &str) -> bool {
+    Url::parse(url)
+        .map(|url| match url.host() {
+            Some(Host::Domain("localhost")) => true,
+            Some(Host::Ipv4(ip)) => ip.is_loopback(),
+            Some(Host::Ipv6(ip)) => ip.is_loopback(),
+            _ => false,
+        })
+        .unwrap_or(false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_local_openlist_url;
+
+    #[test]
+    fn identifies_local_openlist_urls() {
+        for url in [
+            "http://localhost:5244/dav/1",
+            "https://127.0.0.1:5244/dav/1",
+            "http://[::1]:5244/dav/1",
+        ] {
+            assert!(is_local_openlist_url(url));
+        }
+    }
+
+    #[test]
+    fn rejects_remote_openlist_urls() {
+        for url in [
+            "https://openlist.example.com/dav/1",
+            "http://192.168.1.10:5244/dav/1",
+            "not a url",
+        ] {
+            assert!(!is_local_openlist_url(url));
+        }
+    }
+}
+
 async fn auto_start_openlist_core_on_login(app_handle: &tauri::AppHandle) -> Result<(), String> {
     let app_state = app_handle.state::<AppState>();
     let settings = app_state
@@ -138,6 +177,21 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
     if remotes_to_mount.is_empty() {
         log::info!("No Rclone remotes configured for auto-mount on login");
         return Ok(());
+    }
+    if !settings.openlist.auto_launch
+        && remotes_to_mount
+            .iter()
+            .any(|remote| is_local_openlist_url(&remote.url))
+    {
+        log::info!("Trying to auto-start OpenList Core before mounting local remotes");
+        match start_openlist_core(app_state.clone()).await {
+            Ok(_) => {
+                log::info!("OpenList Core process started successfully before mounting local remotes");
+            }
+            Err(e) => {
+                log::error!("Failed to start OpenList Core process before mounting local remotes: {e}");
+            }
+        }
     }
     for remote in remotes_to_mount {
         log::info!(
