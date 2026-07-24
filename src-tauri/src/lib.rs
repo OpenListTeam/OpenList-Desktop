@@ -197,10 +197,14 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
         log::info!("Trying to auto-start OpenList Core before mounting local remotes");
         match start_openlist_core(app_state.clone()).await {
             Ok(_) => {
-                log::info!("OpenList Core process started successfully before mounting local remotes");
+                log::info!(
+                    "OpenList Core process started successfully before mounting local remotes"
+                );
             }
             Err(e) => {
-                log::error!("Failed to start OpenList Core process before mounting local remotes: {e}");
+                log::error!(
+                    "Failed to start OpenList Core process before mounting local remotes: {e}"
+                );
             }
         }
     }
