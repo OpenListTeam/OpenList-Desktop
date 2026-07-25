@@ -2235,10 +2235,10 @@ lru-cache@^11.0.0:
   resolved "https://registry.npmmirror.com/lru-cache/-/lru-cache-11.5.2.tgz#00e16665c90c620fba14a3c368732a976493f760"
   integrity sha512-4pfM1Ff0x50o0tQwb5ucw/RzNyD0/YJME6IVcStalZuMWxdt3sR3huStTtxz4PUmvZfRguvDejasvQ2kifR11g==
 
-lucide-vue-next@^0.563.0:
-  version "0.563.0"
-  resolved "https://registry.yarnpkg.com/lucide-vue-next/-/lucide-vue-next-0.563.0.tgz#b57b65a71aa9ffb249ee5111aa63fd30aca48bee"
-  integrity sha512-zsE/lCKtmaa7bGfhSpN84br1K9YoQ5pCN+2oKWjQQG3Lo6ufUUKBuHSjNFI6RvUevxaajNXb8XwFUKeTXG3sIA==
+lucide-vue-next@^0.577.0:
+  version "0.577.0"
+  resolved "https://registry.yarnpkg.com/lucide-vue-next/-/lucide-vue-next-0.577.0.tgz#840cbc25e748dd69b6abd4133b8c52f8c7fbc052"
+  integrity sha512-py05bAfv9SHVJqscbiOnjcnLlEmOffA58a+7XhZuFxrs6txe1E8VoR1ngWGTYO+9aVKABAz8l3ee3PqiQN9QPA==
 
 magic-string-ast@^1.0.2:
   version "1.0.3"
