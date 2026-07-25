@@ -180,7 +180,8 @@
         "Network": "网络",
         "Performance": "性能",
         "Security": "安全",
-        "WebDAV Specific": "WebDAV 专用"
+        "WebDAV Specific": "WebDAV 专用",
+        "Windows Specific": "Windows 专用"
       },
       "flagDescriptions": {
         "allow-other": "允许其他用户访问挂载点",

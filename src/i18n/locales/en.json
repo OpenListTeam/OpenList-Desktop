@@ -180,7 +180,8 @@
         "Network": "Network",
         "Performance": "Performance",
         "Security": "Security",
-        "WebDAV Specific": "WebDAV Specific"
+        "WebDAV Specific": "WebDAV Specific",
+        "Windows Specific": "Windows Specific"
       },
       "flagDescriptions": {
         "allow-other": "Allow other users to access the mount",
