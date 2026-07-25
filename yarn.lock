@@ -1373,9 +1373,9 @@ chownr@^3.0.0:
   integrity sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==
 
 chrono-node@^2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/chrono-node/-/chrono-node-2.9.0.tgz#a702016d6ec8f6d835a3ba09c6f842fc76969404"
-  integrity sha512-glI4YY2Jy6JII5l3d5FN6rcrIbKSQqKPhWsIRYPK2IK8Mm4Q1ZZFdYIaDqglUNf7gNwG+kWIzTn0omzzE0VkvQ==
+  version "2.10.1"
+  resolved "https://registry.yarnpkg.com/chrono-node/-/chrono-node-2.10.1.tgz#f952269c929721bf321ed87492b0e8f1bfa7cb15"
+  integrity sha512-tPOsBzYVAK5zth+CiHCgp5NGeqRc4mMD8FPthQ5IxkgjPWWxIFdM5odnmfw//IRAzl6C++Xy8olQW7wn5qBR1g==
 
 ci-info@^4.3.1:
   version "4.3.1"
