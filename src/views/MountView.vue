@@ -645,9 +645,7 @@ const commonFlags = [
     ? [
         {
           category: 'Windows Specific',
-          flags: [
-            { flag: '--volname', value: 'OpenlistDAV', descriptionKey: 'volname' },
-          ],
+          flags: [{ flag: '--volname', value: 'OpenlistDAV', descriptionKey: 'volname' }],
         },
       ]
     : []),
