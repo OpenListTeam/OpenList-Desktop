@@ -54,9 +54,10 @@ pub async fn load_settings(state: State<'_, AppState>) -> Result<Option<MergedSe
 
 #[tauri::command]
 pub async fn save_settings(
-    settings: MergedSettings,
+    mut settings: MergedSettings,
     state: State<'_, AppState>,
 ) -> Result<bool, String> {
+    settings.rclone.normalize_network_mode();
     state.update_settings(settings.clone());
     persist_app_settings(&settings)?;
     log::info!("Settings saved successfully");
@@ -65,9 +66,10 @@ pub async fn save_settings(
 
 #[tauri::command]
 pub async fn save_settings_and_restart(
-    settings: MergedSettings,
+    mut settings: MergedSettings,
     state: State<'_, AppState>,
 ) -> Result<bool, String> {
+    settings.rclone.normalize_network_mode();
     state.update_settings(settings.clone());
     persist_app_settings(&settings)?;
     let data_dir = if settings.openlist.data_dir.is_empty() {

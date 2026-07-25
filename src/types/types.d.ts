@@ -34,6 +34,7 @@ interface RcloneFormConfig {
   volumeName?: string
   extraFlags?: string[]
   autoMount: boolean
+  networkMode: boolean
 }
 
 interface RcloneMountInfo {
@@ -96,6 +97,7 @@ interface MountProcessInput {
   id: string
   name: string
   args: string[]
+  networkMode: boolean
   auto_start?: boolean
 }
 

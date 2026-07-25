@@ -85,6 +85,12 @@ impl MergedSettings {
             default
         };
 
+        if settings.rclone.normalize_network_mode()
+            && let Err(e) = settings.save()
+        {
+            log::warn!("Failed to persist migrated Rclone network mode settings: {e}");
+        }
+
         let data_dir = if settings.openlist.data_dir.is_empty() {
             None
         } else {

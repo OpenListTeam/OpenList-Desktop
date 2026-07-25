@@ -204,6 +204,11 @@
                     class="inline-flex items-center py-1 px-2 bg-success/30 rounded-sm text-[0.6rem] font-semibold text-secondary uppercase"
                     >{{ t('mount.meta.autoMount') }}</span
                   >
+                  <span
+                    v-if="isWindows && config.networkMode"
+                    class="inline-flex items-center py-1 px-2 bg-accent/20 rounded-sm text-[0.6rem] font-semibold text-secondary uppercase"
+                    >{{ t('mount.meta.networkMode') }}</span
+                  >
                 </div>
                 <span
                   v-if="getConfigStatus(config.name) === 'error' && !loadingList.includes(config.name)"
@@ -390,6 +395,15 @@
                 :placeholder="t('mount.config.volumeNamePlaceholder')"
               />
             </SettingCard>
+            <SettingCard v-if="isWindows">
+              <CustomSwitch
+                v-model="configForm.networkMode"
+                :title="t('mount.config.networkMode')"
+                class="w-full"
+                no-border
+                small
+              />
+            </SettingCard>
             <SettingCard>
               <CustomSwitch
                 v-model="configForm.autoMount"
@@ -571,6 +585,7 @@ const configForm = ref({
   mountPoint: '',
   volumeName: '',
   autoMount: false,
+  networkMode: false,
   extraFlags: [] as string[],
   extraOptions: {
     'vfs-cache-mode': 'full',
@@ -709,6 +724,7 @@ const editConfig = (config: RcloneFormConfig) => {
     mountPoint: config.mountPoint || '',
     volumeName: config.volumeName || '',
     autoMount: config.autoMount || false,
+    networkMode: config.networkMode || false,
     extraFlags: config.extraFlags || [],
   }
   showAddForm.value = true
@@ -736,6 +752,7 @@ const saveConfig = async () => {
         mountPoint: configForm.value.mountPoint || '',
         volumeName: configForm.value.volumeName || '',
         autoMount: configForm.value.autoMount,
+        networkMode: configForm.value.networkMode,
         extraFlags: configForm.value.extraFlags,
       })
     } else {
@@ -749,6 +766,7 @@ const saveConfig = async () => {
         mountPoint: configForm.value.mountPoint || '',
         volumeName: configForm.value.volumeName || '',
         autoMount: configForm.value.autoMount,
+        networkMode: configForm.value.networkMode,
         extraFlags: configForm.value.extraFlags,
       })
     }
@@ -780,6 +798,7 @@ const resetForm = () => {
     mountPoint: '',
     volumeName: '',
     autoMount: false,
+    networkMode: false,
     extraFlags: [],
   }
   editingConfig.value = null

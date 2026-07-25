@@ -168,6 +168,7 @@
       "addTitle": "添加远程配置",
       "authentication": "身份认证",
       "autoMount": "软件启动时自动挂载",
+      "networkMode": "挂载为网络驱动器",
       "basicInfo": "基本信息",
       "clickToToggleFlags": "点击即可立即添加或移除",
       "editTitle": "编辑远程配置",
@@ -262,7 +263,8 @@
       "updatedSuccessfully": "远程配置 {name} 更新成功"
     },
     "meta": {
-      "autoMount": "自动挂载"
+      "autoMount": "自动挂载",
+      "networkMode": "网络驱动器"
     },
     "stats": {
       "mounted": "已挂载"

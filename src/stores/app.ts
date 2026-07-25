@@ -43,6 +43,7 @@ export const useAppStore = defineStore('app', () => {
     volumeName: '',
     extraFlags: [],
     autoMount: false,
+    networkMode: false,
   }
 
   // Computed
@@ -63,6 +64,7 @@ export const useAppStore = defineStore('app', () => {
         volumeName: saved?.volumeName || '',
         extraFlags: saved?.extraFlags || [],
         autoMount: saved?.autoMount ?? false,
+        networkMode: saved?.networkMode ?? false,
       }
     })
   })
@@ -139,6 +141,7 @@ export const useAppStore = defineStore('app', () => {
         volumeName: config.volumeName || '',
         extraFlags: config.extraFlags || [],
         autoMount: config.autoMount ?? false,
+        networkMode: config.networkMode ?? false,
       }
       const createdConfig: RcloneWebdavConfig = {
         url: fullConfig.url,
@@ -153,6 +156,7 @@ export const useAppStore = defineStore('app', () => {
       settings.value.rclone.mount_config[name] = fullConfig
       await loadRemoteConfigs()
       await saveSettings()
+      await loadSettings()
       return true
     } catch (err: any) {
       error.value = 'Failed to create remote configuration'
@@ -174,6 +178,7 @@ export const useAppStore = defineStore('app', () => {
         volumeName: config.volumeName || undefined,
         extraFlags: config.extraFlags || [],
         autoMount: config.autoMount ?? false,
+        networkMode: config.networkMode ?? false,
       }
       const updatedConfig: RcloneWebdavConfig = {
         url: fullConfig.url,
@@ -188,6 +193,7 @@ export const useAppStore = defineStore('app', () => {
       settings.value.rclone.mount_config[config.name] = fullConfig
       await loadRemoteConfigs()
       await saveSettings()
+      await loadSettings()
       await loadMountInfos()
       return true
     } catch (err: any) {
@@ -247,6 +253,7 @@ export const useAppStore = defineStore('app', () => {
         id,
         name: id,
         args: mountArgs,
+        networkMode: config.networkMode ?? false,
       }
       const createResponse = await TauriAPI.rclone.mounts.mount(createRemoteConfig)
       if (!createResponse || !createResponse.id) {

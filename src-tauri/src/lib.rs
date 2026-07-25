@@ -202,6 +202,7 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
             id: id.clone(),
             name: id.clone(),
             args,
+            network_mode: remote.network_mode.unwrap_or(false),
         };
         match mount_remote(create_remote_config, app_state.clone()).await {
             Ok(_) => {

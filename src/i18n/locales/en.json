@@ -168,6 +168,7 @@
       "addTitle": "Add Remote Configuration",
       "authentication": "Authentication",
       "autoMount": "Auto-mount on App Startup",
+      "networkMode": "Mount as Network Drive",
       "basicInfo": "Basic Information",
       "clickToToggleFlags": "Click on flags to instantly add or remove them from your configuration",
       "editTitle": "Edit Remote Configuration",
@@ -262,7 +263,8 @@
       "updatedSuccessfully": "Remote configuration \"{name}\" updated successfully"
     },
     "meta": {
-      "autoMount": "Auto Mount"
+      "autoMount": "Auto Mount",
+      "networkMode": "Network Drive"
     },
     "stats": {
       "mounted": "Mounted"
