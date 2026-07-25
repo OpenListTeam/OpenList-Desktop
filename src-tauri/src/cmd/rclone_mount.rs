@@ -36,6 +36,14 @@ pub fn get_mount_process_id(remote_name: &str) -> String {
     format!("rclone_mount_{remote_name}_process")
 }
 
+fn split_mount_args(args: Vec<String>) -> Vec<String> {
+    let mut args = args.into_iter();
+    let mut result: Vec<String> = args.by_ref().take(2).collect();
+    let (extra_args, _) = remove_network_mode_flags(split_args_vec(args.collect()));
+    result.extend(extra_args);
+    result
+}
+
 fn insert_mount_flag(args: &mut Vec<String>, flag: String) {
     args.insert(args.len().min(2), flag);
 }
@@ -56,9 +64,28 @@ fn insert_network_mode(args: &mut Vec<String>, network_mode: bool) {
 
 #[cfg(test)]
 mod tests {
-    use super::ensure_vfs_write_cache;
     #[cfg(target_os = "windows")]
     use super::insert_network_mode;
+    use super::{ensure_vfs_write_cache, split_mount_args};
+
+    #[test]
+    fn preserves_mount_positionals_while_splitting_extra_flags() {
+        let args = vec![
+            "--network-mode".into(),
+            r"C:\Mount Dir".into(),
+            "--log-file 'C:\\Log Dir\\rclone.log' --network-mode=false".into(),
+        ];
+
+        assert_eq!(
+            split_mount_args(args),
+            vec![
+                "--network-mode",
+                r"C:\Mount Dir",
+                "--log-file",
+                r"C:\Log Dir\rclone.log"
+            ]
+        );
+    }
 
     #[test]
     fn adds_default_vfs_write_cache() {
@@ -270,7 +297,7 @@ pub async fn mount_remote(
     let rclone_conf_path = get_rclone_config_path_with_custom(state)
         .map_err(|e| format!("Failed to get rclone config path: {e}"))?;
 
-    let (mut args_vec, _) = remove_network_mode_flags(split_args_vec(config.args.clone()));
+    let mut args_vec = split_mount_args(config.args.clone());
     #[cfg(target_os = "windows")]
     insert_network_mode(&mut args_vec, config.network_mode);
     ensure_vfs_write_cache(&mut args_vec);
