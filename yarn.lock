@@ -1480,9 +1480,9 @@ csstype@^3.2.3:
   integrity sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==
 
 czg@^1.12.0:
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/czg/-/czg-1.12.0.tgz#892df369b71127eeb77f5ac851ad81848b03c51c"
-  integrity sha512-LGltcoZ5m7vhe3WNw16QXqd5WurnHegx9V15MwZJtFAU2AVCYLCqDbwxPUgZOnAcdzzooq33ONcU148HOQsjdA==
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/czg/-/czg-1.13.1.tgz#56c88030f98b1e4021e90f4df4ee7458df42b2f8"
+  integrity sha512-mCfY4bCAMAdaFSlrQwtUTChzFAv59kD/y2leX5+C7X9inu0mt/VkHT7gkbzwcToh26oJaOaYPA9lcXUX92/6cw==
 
 data-uri-to-buffer@^4.0.0:
   version "4.0.1"
