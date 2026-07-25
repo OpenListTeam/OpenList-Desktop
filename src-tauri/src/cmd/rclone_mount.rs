@@ -63,6 +63,9 @@ fn insert_network_mode(args: &mut Vec<String>, network_mode: bool) {
     insert_mount_flag(args, format!("--network-mode={network_mode}"));
 }
 
+#[cfg(not(target_os = "windows"))]
+fn insert_network_mode(_args: &mut Vec<String>, _network_mode: bool) {}
+
 #[cfg(test)]
 mod tests {
     #[cfg(target_os = "windows")]
@@ -313,7 +316,6 @@ pub async fn mount_remote(
         .map_err(|e| format!("Failed to get rclone config path: {e}"))?;
 
     let mut args_vec = split_mount_args(config.args.clone());
-    #[cfg(target_os = "windows")]
     insert_network_mode(&mut args_vec, config.network_mode);
     ensure_vfs_write_cache(&mut args_vec);
 
