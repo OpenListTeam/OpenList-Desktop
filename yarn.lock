@@ -2693,15 +2693,10 @@ synckit@^0.11.13, "synckit@^0.6.2 || ^0.7.3 || ^0.11.5":
   dependencies:
     "@pkgr/core" "^0.3.6"
 
-tailwindcss@4.3.3:
+tailwindcss@4.3.3, tailwindcss@^4.1.18:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.3.3.tgz#c006861611c213c1877893ab5b23daa16be2bb55"
   integrity sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==
-
-tailwindcss@^4.1.18:
-  version "4.1.18"
-  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.18.tgz#f488ba47853abdb5354daf9679d3e7791fc4f4e3"
-  integrity sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==
 
 tapable@^2.3.3:
   version "2.3.3"
