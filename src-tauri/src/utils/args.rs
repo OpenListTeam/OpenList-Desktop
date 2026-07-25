@@ -17,9 +17,15 @@ fn parse_network_mode_flag(arg: &str) -> Option<bool> {
 pub fn remove_network_mode_flags(args: Vec<String>) -> (Vec<String>, Option<bool>) {
     let mut filtered = Vec::with_capacity(args.len());
     let mut network_mode = None;
+    let mut options_ended = false;
 
     for arg in args {
-        if is_network_mode_flag(&arg) {
+        if options_ended {
+            filtered.push(arg);
+        } else if arg == "--" {
+            options_ended = true;
+            filtered.push(arg);
+        } else if is_network_mode_flag(&arg) {
             if let Some(value) = parse_network_mode_flag(&arg) {
                 network_mode = Some(value);
             }
@@ -45,14 +51,23 @@ fn quote_arg(arg: &str) -> String {
 pub fn remove_network_mode_flags_from_groups(groups: Vec<String>) -> (Vec<String>, Option<bool>) {
     let mut filtered = Vec::with_capacity(groups.len());
     let mut network_mode = None;
+    let mut options_ended = false;
 
     for group in groups {
+        if options_ended {
+            filtered.push(group);
+            continue;
+        }
+
         let args = split_args(&group);
         let arg_count = args.len();
         let (remaining, group_network_mode) = remove_network_mode_flags(args);
         let removed_network_mode = remaining.len() != arg_count;
         if let Some(value) = group_network_mode {
             network_mode = Some(value);
+        }
+        if remaining.iter().any(|arg| arg == "--") {
+            options_ended = true;
         }
 
         if removed_network_mode {
@@ -159,17 +174,27 @@ mod tests {
     }
 
     #[test]
-    fn removes_managed_flag_after_double_dash_token() {
+    fn preserves_managed_flag_after_option_terminator() {
         let args = vec![
-            "--log-file".into(),
+            "--network-mode".into(),
             "--".into(),
             "--network-mode=false".into(),
         ];
 
         let (filtered, network_mode) = remove_network_mode_flags(args);
 
-        assert_eq!(filtered, vec!["--log-file", "--"]);
-        assert_eq!(network_mode, Some(false));
+        assert_eq!(filtered, vec!["--", "--network-mode=false"]);
+        assert_eq!(network_mode, Some(true));
+    }
+
+    #[test]
+    fn preserves_groups_after_option_terminator() {
+        let groups = vec!["--network-mode --".into(), "--network-mode=false".into()];
+
+        let (filtered, network_mode) = remove_network_mode_flags_from_groups(groups);
+
+        assert_eq!(filtered, vec!["--", "--network-mode=false"]);
+        assert_eq!(network_mode, Some(true));
     }
 
     #[test]

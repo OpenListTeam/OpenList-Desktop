@@ -51,6 +51,7 @@ fn insert_mount_flag(args: &mut Vec<String>, flag: String) {
 fn ensure_vfs_write_cache(args: &mut Vec<String>) {
     let has_cache_mode = args
         .iter()
+        .take_while(|arg| *arg != "--")
         .any(|arg| arg == "--vfs-cache-mode" || arg.starts_with("--vfs-cache-mode="));
     if !has_cache_mode {
         insert_mount_flag(args, "--vfs-cache-mode=writes".into());
@@ -108,6 +109,20 @@ mod tests {
                 "--"
             ]
         );
+    }
+
+    #[test]
+    fn ignores_vfs_cache_mode_after_option_terminator() {
+        let mut args = vec![
+            "remote:".into(),
+            "mount-point".into(),
+            "--".into(),
+            "--vfs-cache-mode=full".into(),
+        ];
+
+        ensure_vfs_write_cache(&mut args);
+
+        assert_eq!(args[2], "--vfs-cache-mode=writes");
     }
 
     #[test]
