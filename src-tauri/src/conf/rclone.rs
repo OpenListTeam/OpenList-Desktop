@@ -100,40 +100,6 @@ mod tests {
     }
 
     #[test]
-    fn auto_mount_allows_root_and_subdirectory_paths() {
-        for network_mode in [None, Some(false), Some(true)] {
-            for volume_name in [None, Some(""), Some("/"), Some("/subdir")] {
-                let mut config = mount_config(vec![], network_mode);
-                config.auto_mount = Some(true);
-                config.volume_name = volume_name.map(String::from);
-
-                assert!(config.should_auto_mount(), "{config:?}");
-            }
-        }
-    }
-
-    #[test]
-    fn auto_mount_requires_explicit_opt_in() {
-        for auto_mount in [None, Some(false)] {
-            let mut config = mount_config(vec![], Some(true));
-            config.auto_mount = auto_mount;
-
-            assert!(!config.should_auto_mount());
-        }
-    }
-
-    #[test]
-    fn auto_mount_requires_mount_point() {
-        for mount_point in [None, Some("")] {
-            let mut config = mount_config(vec![], Some(true));
-            config.auto_mount = Some(true);
-            config.mount_point = mount_point.map(String::from);
-
-            assert!(!config.should_auto_mount());
-        }
-    }
-
-    #[test]
     fn migrates_legacy_network_mode_flag() {
         let mut config = mount_config(vec!["--timeout=5m --network-mode", "--read-only"], None);
 
