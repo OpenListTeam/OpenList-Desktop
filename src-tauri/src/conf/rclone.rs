@@ -25,6 +25,11 @@ pub struct RcloneMountConfig {
 }
 
 impl RcloneMountConfig {
+    pub fn should_auto_mount(&self) -> bool {
+        // An empty remote path is valid: `remote:` mounts the remote root.
+        self.auto_mount.unwrap_or(false) && !self.mount_point.as_deref().unwrap_or("").is_empty()
+    }
+
     pub fn normalize_network_mode(&mut self) -> bool {
         let Some(extra_flags) = self.extra_flags.take() else {
             return false;
