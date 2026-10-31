@@ -1,6 +1,7 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use tauri::Manager;
+use tokio::time::{Duration, Instant, sleep, timeout};
 use url::{Host, Url};
 
 mod cmd;
@@ -104,6 +105,25 @@ fn is_local_openlist_url(url: &str) -> bool {
         .unwrap_or(false)
 }
 
+async fn wait_for_openlist_core_ready(app_handle: &tauri::AppHandle) -> Result<(), String> {
+    let deadline = Instant::now() + Duration::from_secs(30);
+
+    loop {
+        let status = timeout(
+            Duration::from_secs(2),
+            get_openlist_core_status(app_handle.state()),
+        )
+        .await;
+        if matches!(status, Ok(Ok(status)) if status.running) {
+            return Ok(());
+        }
+        if Instant::now() >= deadline {
+            return Err("Timed out waiting for OpenList Core to become ready".into());
+        }
+        sleep(Duration::from_millis(500)).await;
+    }
+}
+
 async fn auto_start_openlist_core_on_login(app_handle: &tauri::AppHandle) -> Result<(), String> {
     let app_state = app_handle.state::<AppState>();
     let settings = app_state
@@ -141,31 +161,36 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
         .as_ref()
         .unwrap_or(&HashMap::new())
         .values()
-        .filter(|config| {
-            config.auto_mount.unwrap_or(false)
-                && !config.mount_point.as_deref().unwrap_or("").is_empty()
-                && !config.volume_name.as_deref().unwrap_or("").is_empty()
-        })
+        .filter(|config| config.should_auto_mount())
         .cloned()
         .collect();
     if remotes_to_mount.is_empty() {
         log::info!("No Rclone remotes configured for auto-mount on login");
         return Ok(());
     }
-    let has_local_remote = RcloneConfigFile::load_with_custom(app_state.clone())
+    let local_remote_names: HashSet<String> = RcloneConfigFile::load_with_custom(app_state.clone())
         .map(|config| {
-            remotes_to_mount.iter().any(|remote| {
-                config
-                    .remotes
-                    .get(&remote.name)
-                    .and_then(|remote| remote.options.get("url"))
-                    .is_some_and(|url| is_local_openlist_url(url))
-            })
+            remotes_to_mount
+                .iter()
+                .filter(|remote| {
+                    config
+                        .remotes
+                        .get(&remote.name)
+                        .and_then(|remote| remote.options.get("url"))
+                        .is_some_and(|url| is_local_openlist_url(url))
+                })
+                .map(|remote| remote.name.clone())
+                .collect()
         })
         .unwrap_or_else(|e| {
             log::error!("Failed to load Rclone config before mounting remotes: {e}");
-            false
+            remotes_to_mount
+                .iter()
+                .filter(|remote| is_local_openlist_url(&remote.url))
+                .map(|remote| remote.name.clone())
+                .collect()
         });
+    let has_local_remote = !local_remote_names.is_empty();
     if !settings.openlist.auto_launch && has_local_remote {
         log::info!("Trying to auto-start OpenList Core before mounting local remotes");
         match start_openlist_core(app_state.clone()).await {
@@ -181,7 +206,31 @@ async fn auto_mount_rclone_remotes_on_login(app_handle: &tauri::AppHandle) -> Re
             }
         }
     }
+    let mut core_ready = None;
     for remote in remotes_to_mount {
+        if local_remote_names.contains(&remote.name) {
+            let ready = match core_ready {
+                Some(ready) => ready,
+                None => {
+                    let ready = match wait_for_openlist_core_ready(app_handle).await {
+                        Ok(()) => true,
+                        Err(e) => {
+                            log::error!("OpenList Core is not ready for local auto-mounts: {e}");
+                            false
+                        }
+                    };
+                    core_ready = Some(ready);
+                    ready
+                }
+            };
+            if !ready {
+                log::error!(
+                    "Skipping local rclone remote '{}' because OpenList Core is not ready",
+                    remote.name
+                );
+                continue;
+            }
+        }
         log::info!(
             "Auto-mount on login is enabled for remote '{}', attempting to mount",
             remote.name
