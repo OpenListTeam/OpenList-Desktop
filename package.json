@@ -51,7 +51,13 @@
     "ajv": "^6.14.0",
     "flatted": "^3.4.2",
     "yaml": "^2.8.3",
-    "postcss": "^8.5.10"
+    "postcss": "^8.5.10",
+    "baseline-browser-mapping": "^2.11.0",
+    "brace-expansion": "^5.0.12",
+    "browserslist": "^4.28.7",
+    "nanoid": "^3.3.18",
+    "postcss-selector-parser": "^7.1.6",
+    "source-map-js": "^1.2.2"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.10.1",
@@ -68,8 +74,8 @@
     "lucide-vue-next": "^0.577.0",
     "marked": "^17.0.1",
     "pinia": "^3.0.4",
-    "vue": "^3.5.27",
-    "vue-i18n": "11.2.8",
+    "vue": "^3.5.42",
+    "vue-i18n": "11.4.16",
     "vue-router": "^5.0.2"
   },
   "devDependencies": {
@@ -80,7 +86,7 @@
     "@typescript-eslint/eslint-plugin": "^8.65.0",
     "@typescript-eslint/parser": "^8.65.0",
     "@vitejs/plugin-vue": "^6.0.4",
-    "adm-zip": "^0.6.0",
+    "adm-zip": "^0.6.1",
     "cross-env": "^10.0.0",
     "czg": "^1.12.0",
     "dpdm": "^4.2.0",
@@ -101,7 +107,7 @@
     "tar": "^7.5.18",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.65.0",
-    "vite": "^7.3.5",
+    "vite": "^7.3.7",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.2.4"
   }
