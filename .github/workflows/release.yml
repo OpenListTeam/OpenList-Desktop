@@ -386,7 +386,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: '*-build'
           merge-multiple: true
@@ -429,7 +429,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: '*-build'
           merge-multiple: true
