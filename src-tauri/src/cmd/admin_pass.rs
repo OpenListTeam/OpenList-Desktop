@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use rand::Rng;
+use rand::RngExt;
 use rand::distr::Alphanumeric;
 use tauri::State;
 
