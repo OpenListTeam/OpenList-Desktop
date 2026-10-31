@@ -162,7 +162,13 @@ impl ProcessManager {
             }
         };
 
-        let mut sys = System::new_all();
+        let mut sys = match System::new_all() {
+            Ok(s) => s,
+            Err(e) => {
+                log::warn!("Failed to initialize system info: {e}");
+                return;
+            }
+        };
         sys.refresh_processes(ProcessesToUpdate::All, true);
         let mut processes = self.processes.write();
         let mut recovered_count = 0;
