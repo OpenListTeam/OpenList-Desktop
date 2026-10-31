@@ -115,7 +115,8 @@ pub async fn get_openlist_core_status(state: State<'_, AppState>) -> Result<Serv
     let health_check_url = format!("{protocol}://localhost:{port}");
     let health_url = format!("{health_check_url}/ping");
 
-    // OpenList commonly uses self-signed certificates for local HTTPS endpoints.
+    // OpenList commonly uses self-signed certificates for local HTTPS
+    // endpoints.
     let client = reqwest::Client::builder()
         .tls_danger_accept_invalid_certs(openlist_config.ssl_enabled)
         .build()
