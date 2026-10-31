@@ -2905,7 +2905,7 @@ dependencies = [
 
 [[package]]
 name = "openlist-desktop"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
