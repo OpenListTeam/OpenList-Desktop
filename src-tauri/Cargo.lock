@@ -2938,7 +2938,7 @@ dependencies = [
  "once_cell",
  "open",
  "parking_lot",
- "rand 0.9.5",
+ "rand 0.10.2",
  "regex",
  "reqwest",
  "runas",
