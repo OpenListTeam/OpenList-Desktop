@@ -230,7 +230,7 @@ Add custom Rclone flags for optimal performance:
 
 #### Prerequisites
 
-- **Node.js**: v22+ with yarn
+- **Node.js**: ^22.18.0 or >=24.11.0 with yarn
 - **Rust**: Latest nightly version
 - **Git**: Version control
 
