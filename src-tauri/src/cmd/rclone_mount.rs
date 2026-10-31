@@ -319,7 +319,7 @@ pub async fn mount_remote(
     insert_network_mode(&mut args_vec, config.network_mode);
     ensure_vfs_write_cache(&mut args_vec);
 
-    // FUSE requires an existing mount point, while WinFsp requires it to not exist
+    // FUSE needs an existing mount point, but WinFsp requires it to not exist
     #[cfg(not(target_os = "windows"))]
     let mount_point_opt = args_vec.iter().filter(|arg| !arg.starts_with('-')).nth(1);
 
