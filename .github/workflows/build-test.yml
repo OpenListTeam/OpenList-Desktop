@@ -100,7 +100,7 @@ jobs:
         uses: actions/checkout@v7
       
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@1.99.1
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Add Rust Target
         run: rustup target add ${{ matrix.target }}
@@ -307,7 +307,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@1.99.1
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Add Rust Target
         run: rustup target add ${{ matrix.target }}
