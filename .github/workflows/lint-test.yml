@@ -78,6 +78,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@nightly
         with:
+          toolchain: nightly-2026-10-31
           targets: ${{ matrix.platform.target }}
           components: rustfmt, clippy
 
@@ -162,6 +163,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@nightly
         with:
+          toolchain: nightly-2026-10-31
           targets: ${{ matrix.platform.target }}
 
       - name: Cache Rust dependencies
