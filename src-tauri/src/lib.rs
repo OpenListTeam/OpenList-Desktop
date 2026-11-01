@@ -359,6 +359,10 @@ pub fn run() {
 
             utils::path::get_app_logs_dir()?;
             utils::init_log::init_log()?;
+            #[cfg(target_os = "windows")]
+            if let Err(e) = utils::path::migrate_legacy_data_dir() {
+                log::warn!("Failed to migrate legacy data: {e}");
+            }
             utils::path::get_app_config_dir()?;
             let settings = conf::config::MergedSettings::load().unwrap_or_default();
             let show_window = settings.app.show_window_on_startup.unwrap_or(true);

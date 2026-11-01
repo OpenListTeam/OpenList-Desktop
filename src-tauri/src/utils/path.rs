@@ -207,3 +207,86 @@ pub fn get_rclone_config_path_with_custom(state: State<'_, AppState>) -> Result<
 pub fn get_default_openlist_data_dir() -> Result<PathBuf, String> {
     Ok(get_user_data_dir()?.join("data"))
 }
+
+// Before v0.8.0, settings.json, rclone.conf and the default data dir were
+// stored next to the executable on Windows. Copy them to the per-user data dir
+// once, keeping the originals as backup.
+#[cfg(target_os = "windows")]
+pub fn migrate_legacy_data_dir() -> Result<(), String> {
+    let legacy_dir = get_app_dir()?;
+    let user_dir = get_user_data_dir()?;
+    let legacy_settings = legacy_dir.join("settings.json");
+    let settings = user_dir.join("settings.json");
+    if legacy_dir == user_dir || settings.exists() || !legacy_settings.exists() {
+        return Ok(());
+    }
+    log::info!("Migrating legacy data from {legacy_dir:?} to {user_dir:?}");
+
+    let legacy_data_dir = legacy_dir.join("data");
+    let data_dir = user_dir.join("data");
+    if legacy_data_dir.is_dir()
+        && !data_dir.exists()
+        && let Err(e) = copy_dir(&legacy_data_dir, &data_dir)
+            .and_then(|_| rewrite_data_config_paths(&data_dir, &legacy_data_dir))
+    {
+        let _ = fs::remove_dir_all(&data_dir);
+        return Err(format!("Failed to migrate legacy data directory: {e}"));
+    }
+
+    let legacy_rclone_config = legacy_dir.join("rclone.conf");
+    let rclone_config = user_dir.join("rclone.conf");
+    if legacy_rclone_config.is_file() && !rclone_config.exists() {
+        fs::copy(&legacy_rclone_config, &rclone_config)
+            .map_err(|e| format!("Failed to migrate legacy rclone config: {e}"))?;
+    }
+
+    fs::copy(&legacy_settings, &settings)
+        .map_err(|e| format!("Failed to migrate legacy settings: {e}"))?;
+    log::info!("Legacy data migration completed");
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+fn copy_dir(src: &Path, dst: &Path) -> Result<(), String> {
+    fs::create_dir_all(dst).map_err(|e| format!("Failed to create {dst:?}: {e}"))?;
+    for entry in fs::read_dir(src).map_err(|e| format!("Failed to read {src:?}: {e}"))? {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let target = dst.join(entry.file_name());
+        if entry.file_type().map_err(|e| e.to_string())?.is_dir() {
+            copy_dir(&entry.path(), &target)?;
+        } else {
+            fs::copy(entry.path(), &target)
+                .map_err(|e| format!("Failed to copy {:?}: {e}", entry.path()))?;
+        }
+    }
+    Ok(())
+}
+
+// OpenList Core stores absolute paths derived from the data dir in config.json
+// and does not re-derive them on load, so point the ones under the legacy data
+// dir to the new location.
+#[cfg(target_os = "windows")]
+fn rewrite_data_config_paths(data_dir: &Path, legacy_data_dir: &Path) -> Result<(), String> {
+    let config_path = data_dir.join("config.json");
+    if !config_path.exists() {
+        return Ok(());
+    }
+    let content = fs::read_to_string(&config_path).map_err(|e| e.to_string())?;
+    let mut config: serde_json::Value =
+        serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    for pointer in ["/database/db_file", "/temp_dir", "/bleve_dir", "/log/name"] {
+        let Some(value) = config.pointer_mut(pointer) else {
+            continue;
+        };
+        let Some(relative) = value
+            .as_str()
+            .and_then(|path| Path::new(path).strip_prefix(legacy_data_dir).ok())
+            .map(Path::to_path_buf)
+        else {
+            continue;
+        };
+        *value = serde_json::Value::String(data_dir.join(relative).to_string_lossy().into_owned());
+    }
+    let content = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
+    fs::write(&config_path, content).map_err(|e| e.to_string())
+}
