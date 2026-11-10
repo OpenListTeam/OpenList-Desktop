@@ -291,7 +291,7 @@ pub async fn rclone_delete_remote(
 
     let process_id = get_mount_process_id(&name);
     if PROCESS_MANAGER.is_registered(&process_id) {
-        let _ = PROCESS_MANAGER.stop(&process_id);
+        PROCESS_MANAGER.stop(&process_id)?;
         let _ = PROCESS_MANAGER.remove(&process_id);
     }
 
@@ -364,7 +364,7 @@ pub async fn mount_remote(
     };
 
     if PROCESS_MANAGER.is_registered(&config.id) {
-        let _ = PROCESS_MANAGER.stop(&config.id);
+        PROCESS_MANAGER.stop(&config.id)?;
         sleep(Duration::from_millis(500)).await;
         let _ = PROCESS_MANAGER.remove(&config.id);
         sleep(Duration::from_millis(500)).await;
