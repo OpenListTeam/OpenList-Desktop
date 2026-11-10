@@ -38,6 +38,14 @@ use crate::conf::rclone::RcloneMountConfig;
 use crate::conf::rclone_config::RcloneConfigFile;
 
 #[tauri::command]
+fn restart_application(app: tauri::AppHandle) {
+    #[cfg(target_os = "macos")]
+    core::shutdown::restart(&app);
+    #[cfg(not(target_os = "macos"))]
+    app.restart();
+}
+
+#[tauri::command]
 async fn update_tray_menu(
     app_handle: tauri::AppHandle,
     service_running: bool,
@@ -301,6 +309,7 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(app_state)
         .invoke_handler(tauri::generate_handler![
+            restart_application,
             // OpenList Core management
             start_openlist_core,
             stop_openlist_core,
@@ -389,6 +398,8 @@ pub fn run() {
                     "App state initialization failed: {e}"
                 ))));
             }
+            #[cfg(target_os = "macos")]
+            core::shutdown::install_menu(app_handle)?;
             if let Err(e) = tray::create_tray(app_handle) {
                 log::error!("Failed to create system tray: {e}");
             } else {
@@ -433,8 +444,14 @@ pub fn run() {
             log::info!("OpenList Desktop initialized successfully");
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|_app, _event| {
+            #[cfg(target_os = "macos")]
+            if let tauri::RunEvent::ExitRequested { api, code, .. } = _event {
+                core::shutdown::on_exit_requested(_app, &api, code);
+            }
+        });
 }
 
 #[cfg(test)]

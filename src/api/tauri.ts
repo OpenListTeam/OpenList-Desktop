@@ -1,7 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { appDataDir, join } from '@tauri-apps/api/path'
-import { relaunch } from '@tauri-apps/plugin-process'
 import { check, type DownloadEvent } from '@tauri-apps/plugin-updater'
 
 let pendingUpdateInstance: Awaited<ReturnType<typeof check>> = null
@@ -187,7 +186,7 @@ export class TauriAPI {
     },
 
     relaunch: async (): Promise<void> => {
-      await relaunch()
+      await invoke('restart_application')
     },
 
     currentVersion: (): Promise<string> => invoke('get_current_version'),

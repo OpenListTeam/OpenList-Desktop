@@ -94,8 +94,10 @@ pub fn update_tray_menu(app_handle: &AppHandle, service_running: bool) -> tauri:
 
 async fn handle_menu_event(app: &AppHandle, id: &str) -> Result<(), String> {
     match id {
+        #[cfg(target_os = "macos")]
+        crate::core::shutdown::QUIT_MENU_ID => {}
         ID_QUIT => app.exit(0),
-        ID_RESTART_APP => app.restart(),
+        ID_RESTART_APP => crate::restart_application(app.clone()),
         ID_SHOW => {
             if let Some(window) = get_main_window(app) {
                 let _ = window.show();
